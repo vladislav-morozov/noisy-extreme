@@ -21,6 +21,7 @@ function [y, x, thetaS, u] =noisyExtreme_linearModelDrawData(N, T, constantInclu
     % Draw x with given xSampler
     x = zeros(T, N, numCov);
     % Draw x
+    sigmaSqX = 7;
     for t=1:T
         for i=1:N
             x(t, i, :) = rhoXtheta*thetaS(i,:) + sqrt(sigmaSqX*(1+rhoXtheta*norm(thetaS(i,:))))...

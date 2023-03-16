@@ -42,6 +42,10 @@ function [extrapolationEst, extrapolationInt, possibleConstruction] = ...
             extrapolationInt(1, j)= -Inf;
             extrapolationInt(2, j) = Inf;
             possibleConstruction(j) =0;
+        elseif pn(j)==0 %check for the first quantile
+            extrapolationInt(1, j)= -Inf;
+            extrapolationInt(2, j) = Inf;
+            possibleConstruction(j) =0;
         else
             if j==1
                 qGamma = qGamma+integral(dgamma, 1, dn(j));

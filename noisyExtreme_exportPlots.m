@@ -1,25 +1,28 @@
+
+
 %% Plotting parameters
 
 plotLineThickness= 1.1;
 
 plotW = 800;
-plotH = 300;
-plotHMae = 800;
+plotWsel = 1000;
+plotHall = 400;
+plotH = 270;
+plotHMae = 700;
 % Specify colors
-colorSSmax= [0.99, 0.03, 1]; % magenta
-% colorSSmixed = [0.5, 0.03, 1]; % violet
-colorSSmixed = [222, 7, 7]/255;
-
+colorSSmax= [0.99, 0.03, 1];  % subsampled with r=0
+colorSSmixed = [222, 7, 7]/255; % subsampled with r=l
 colorSimMax = [0.03,0.99, 0.99];
-colorSimMixed = [3, 103, 161]/255;
-colorSimMixedT = [2, 16, 97]/255;
-
-% colorInterNormal = [255, 255, 25]/255;
-colorInterNormal = [227, 207, 30]/255;
-colorInterSS = [230, 187, 46]/255;
-
+colorSimMaxHill = [60, 103, 161]/255; % Hill
+colorSimMixedHill = [3, 103, 161]/255; % Hill
+colorSimMaxPWM = [60, 16, 97]/255; % PWM
+colorSimMixedPWM = [2, 16, 97]/255; % PWM
+colorInterNormal = [227, 207, 30]/255; % IVT with normal quantiles
+colorInterSS = [230, 187, 46]/255; % IVT with subsampling
+colorExtrapolation = [255, 165,0]/255; % Extrapolation
 colorRaw = [46, 230, 46]/255;
 colorJW = [ 106, 130, 68]/255;
+colorMW = [ 0, 130, 128]/255;
 %% Load in files
 
 currentFileName =  ['Outputs/',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
@@ -27,56 +30,95 @@ currentFileName =  ['Outputs/',num2str(nSamples),'N', num2str(N), 'T', num2str(T
         uParamNameSave{uDistrChoice}, num2str(uDistributionParam{uDistrChoice}),'.mat' ];
 load(currentFileName)
 
-uName{1} = 'N(0, \sigma^2)'; %Correcting notation
+% Patch in the extrapolation estimator
+currentFileName =  ['Outputs/inter',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
+        thetaParamNameSave{thetaDistrChoice}, num2str(thetaDistributionParam{thetaDistrChoice}),...
+        uParamNameSave{uDistrChoice}, num2str(uDistributionParam{uDistrChoice}),'.mat' ];
+load(currentFileName)
 
 % Set spacing based on quantiles associated to the distribution
 spacingStep = 10;
 spacing = 1:length(quantilesConsidered);
 spacing= (spacing).^spacingExponent;
 
+plotQuietly =1; 
+
 %% Coverages (all)
+
+% Create figure
 if plotQuietly ~= 1
-    % Plot
-    p = figure('Renderer', 'painters', 'Position', [50 50 plotW plotH]);
+    p = figure('Renderer', 'painters', 'Position', [50 50 plotW plotHall]);
 else
-    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 800 350]);% Do not plot
+    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 plotW plotHall]);% Do not plot
 end
-plot(spacing, mean(containsSubsampledMax,1),'-o','LineWidth', plotLineThickness, 'Color', colorSSmax) % very magenta
-xticks([spacing(1:spacingStep:end), spacing(end)])
+
+% Start plot, create labels
+plot(spacing, mean(containsSubsampledMax,1),'-o','LineWidth', plotLineThickness, 'Color', colorSSmixed) % very magenta
+xticks([spacing(1:spacingStep:end), spacing(end)])  
 xticklabels([quantilesConsidered(1:spacingStep:end), quantilesConsidered(end)])
 xlim([min(spacing), max(spacing)]);
 hold on
-% plot(spacing, mean(containsSubsampledq,1),'LineWidth', 2)
-plot(spacing, mean(containsSubsampledMixed,1),'-x','LineWidth', plotLineThickness, 'Color', colorSSmixed)
-plot(spacing, mean(containsSimulatedMax,1),'-d', 'LineWidth', plotLineThickness, 'Color', colorSimMax)
-% plot(spacing, mean(containsSimulatedQ,1),'LineWidth', plotLineThickness)
-plot(spacing, mean(containsSimulatedMixed,1),'-s','LineWidth', plotLineThickness, 'Color', colorSimMixed)
-% plot(spacing, mean(containsSimulatedMaxT,1),'LineWidth', plotLineThickness)
-% plot(spacing, mean(containsSimulatedQT,1),'LineWidth', plotLineThickness)
-plot(spacing, mean(containsSimulatedMixedT,1),'-p','LineWidth', plotLineThickness, 'Color', colorSimMixedT)
 
-plot(spacing, mean(containsIntermediateNormal,1),'--^','LineWidth', plotLineThickness, 'Color', colorInterNormal)
-plot(spacing, mean(containsIntermediateSS,1),'--v','LineWidth', plotLineThickness, 'Color', colorInterSS)
+% Subsampled with r=l, q=qSubsampling
+plot(spacing, mean(containsSubsampledMixed,1),'-x','LineWidth', plotLineThickness, 'Color', colorSSmax)
+% Simulated using PWM estimator
+plot(spacing, mean(containsPWMMax,1),'-*', 'LineWidth', plotLineThickness, 'Color', colorSimMaxPWM)
+plot(spacing, mean(containsPWMMixed,1),'-pentagram', 'LineWidth', plotLineThickness, 'Color', colorSimMixedPWM)
+% Simulated with Hill estimator, only for heavy-tailed distribution
+if j==1
+    plot(spacing, mean(containsHillMax,1),'-diamond', 'LineWidth', plotLineThickness, 'Color', colorSimMaxHill)
+    plot(spacing, mean(containsHillMixed,1),'-square', 'LineWidth', plotLineThickness, 'Color', colorSimMixedHill)
+end
+% IVT
+ kIVT = floor((1-quantilesConsidered)*N); % Solve for k
+sIIVT = floor(sqrt(kIVT)); % Take square root
+IVTpossible = sIIVT>0;
+interNormal = mean(containsIntermediateNormal,1);
+interSS = mean(containsIntermediateSS,1);
+plot(spacing(IVTpossible), interNormal(IVTpossible),'--^','LineWidth', plotLineThickness, 'Color', colorInterNormal)
+plot(spacing(IVTpossible), interSS(IVTpossible),'--v','LineWidth', plotLineThickness, 'Color', colorInterSS)
+% Extrapolation
+extrValid = logical(nonEmptyExtrapolation(end, :)); % quantiles for which construction of the interval is possible
+extrCoverage = mean(containsExtrapolation,1);
+plot(spacing(extrValid),extrCoverage(extrValid) ,'--<','LineWidth', plotLineThickness, 'Color', colorExtrapolation)
+% Central
 plot(spacing, mean(containsNaive,1), '-.+','LineWidth', plotLineThickness, 'Color', colorRaw)
 plot(spacing, mean(containsDebiased,1),'-..','LineWidth', plotLineThickness, 'Color', colorJW)
 %plot(spacing, mean(containsTrue,1),'LineWidth', plotLineThickness)
 yline(1-alphaCI) ;
- 
-if T==30
-    legend('Subsampling: max only',  'Subsampling: mixed',  ...
-         'Simulated: max only','Simulated: mixed',...
-         'Simulated: mixed with truncation',...
-        'Intermediate: normal', 'Intermediate: Subsampling',...
-         'Central: raw data', 'Central: analytical correction',...
-        'Location', 'southwest')%, 'Central: true')
+
+if N==2000
+    if j==1 % Account for using the Hill estimator
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Extreme: max, PWM','Extreme: mixed, PWM',...
+            'Extreme: max, Hill', 'Extreme: mixed, Hill',...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    else % No Hill estimator
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Extreme: max, PWM','Extreme: mixed, PWM',...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    end
 end
+
+   
 
 xlabel('Quantile')
 ylabel('Coverage')
-title(['Coverage, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
-    thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
-    num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
-    ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+
+if t<3 % Add an alternative naming scheme for noiseless data
+    title(['Coverage, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
+        ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+else
+    title(['Coverage, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', noiseless data'])
+end
 
  
 figureSavingName = ['Figures/allCoverage',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
@@ -87,45 +129,72 @@ saveas(p,figureSavingName,'epsc');
 
 %% Coverages (selected)
 
-
+% Create figure
 if plotQuietly ~= 1
     % Plot
-    p = figure('Renderer', 'painters', 'Position', [50 50 plotW plotH]);
+    p = figure('Renderer', 'painters', 'Position', [50 50 plotWsel plotH]);
 else
-    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 800 350]);% Do not plot
+    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 plotWsel plotH]);% Do not plot
 end
-plot(spacing, mean(containsSubsampledMax,1),'-o','LineWidth', plotLineThickness,  'Color', colorSSmax)
-xticks([spacing(1:spacingStep:end), spacing(end)])
+
+
+% Start plot, create labels
+plot(spacing, mean(containsSubsampledMax,1),'-o','LineWidth', plotLineThickness, 'Color', colorSSmixed) % very magenta
+xticks([spacing(1:spacingStep:end), spacing(end)])  
 xticklabels([quantilesConsidered(1:spacingStep:end), quantilesConsidered(end)])
 xlim([min(spacing), max(spacing)]);
 hold on
-% plot(spacing, mean(containsSubsampledq,1),'LineWidth', 2)
-plot(spacing, mean(containsSubsampledMixed,1),'-x','LineWidth', plotLineThickness, 'Color', colorSSmixed)
-% plot(spacing, mean(containsSimulatedMax,1),'LineWidth', plotLineThickness)
-% plot(spacing, mean(containsSimulatedQ,1),'LineWidth', plotLineThickness)
-plot(spacing, mean(containsSimulatedMixed,1),'-s','LineWidth', plotLineThickness, 'Color', colorSimMixed)
-% plot(spacing, mean(containsSimulatedMaxT,1),'LineWidth', plotLineThickness)
-% plot(spacing, mean(containsSimulatedQT,1),'LineWidth', plotLineThickness)
-% plot(spacing, mean(containsSimulatedMixedT,1),'LineWidth', plotLineThickness)
 
-plot(spacing, mean(containsIntermediateNormal,1),'--^','LineWidth', plotLineThickness, 'Color', colorInterNormal)
-% plot(spacing, mean(containsIntermediateSS,1),'LineWidth', plotLineThickness)
+% Subsampled with r=l, q=qSubsampling
+plot(spacing, mean(containsSubsampledMixed,1),'-x','LineWidth', plotLineThickness, 'Color', colorSSmax)
+% Add universally consistent simulated line for larger sample sizes
+if N>=1000
+    plot(spacing, mean(containsPWMMixed,1),'-pentagram', 'LineWidth', plotLineThickness, 'Color', colorSimMixedPWM)
+
+end
+% IVT
+  
+interNormal = mean(containsIntermediateNormal,1);
+interSS = mean(containsIntermediateSS,1);
+plot(spacing(IVTpossible), interNormal(IVTpossible),'--^','LineWidth', plotLineThickness, 'Color', colorInterNormal)
+plot(spacing(IVTpossible), interSS(IVTpossible),'--v','LineWidth', plotLineThickness, 'Color', colorInterSS)
+% Extrapolation
+extrValid = logical(nonEmptyExtrapolation(end, :)); % quantiles for which construction of the interval is possible
+extrCoverage = mean(containsExtrapolation,1);
+plot(spacing(extrValid),extrCoverage(extrValid) ,'--<','LineWidth', plotLineThickness, 'Color', colorExtrapolation)
+% Central
 plot(spacing, mean(containsNaive,1), '-.+','LineWidth', plotLineThickness, 'Color', colorRaw)
-plot(spacing, mean(containsDebiased,1),'-..','LineWidth', plotLineThickness,  'Color', colorJW)
-% plot(spacing, mean(containsTrue,1),'LineWidth', plotLineThickness)
+plot(spacing, mean(containsDebiased,1),'-..','LineWidth', plotLineThickness, 'Color', colorJW)
+%plot(spacing, mean(containsTrue,1),'LineWidth', plotLineThickness)
 yline(1-alphaCI) ;
-%  
-legend('Subsampling: max only',  'Subsampling: mixed',  ...
-     'Simulated: mixed',...
-    'Intermediate',      'Central: raw data', 'Central: analytical correction',...
-    'Location', 'southwest')%, 'Central: true')
+
+if N==2000
+    if N>=1000
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Extreme: mixed, PWM',...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    else
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    end
+end
+
 xlabel('Quantile')
 ylabel('Coverage')
-title(['Coverage, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
-    thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
-    num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
-    ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
-
+if t<3 % Add an alternative naming scheme for noiseless data
+    title(['Coverage, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
+        ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+else
+    title(['Coverage, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', noiseless data'])
+end
  
 figureSavingName = ['Figures/selectedCoverage',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
     thetaParamNameSave{thetaDistrChoice}, num2str(thetaDistributionParam{thetaDistrChoice}),...
@@ -134,172 +203,252 @@ figureSavingName = ['Figures/selectedCoverage',num2str(nSamples),'N', num2str(N)
 saveas(p,figureSavingName,'epsc');
 %% Interval length (all)
 
- 
 
- 
+
+
+% Create plot
 if plotQuietly ~= 1
     % Plot
-    p = figure('Renderer', 'painters', 'Position', [50 50 plotW plotH]);
+    p = figure('Renderer', 'painters', 'Position', [50 50 plotW plotHall]);
 else
-    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 800 350]);% Do not plot
+    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 plotW plotHall]);% Do not plot
 end
 
-plot(spacing, mean(lengthSubsampledMax,1),'-o', 'LineWidth', plotLineThickness,  'Color', colorSSmax)
-hold on
-xticks([spacing(1:spacingStep:end), spacing(end)])
+
+% Start plot, create labels
+plot(spacing, mean(lengthSubsampledMax,1),'-o','LineWidth', plotLineThickness, 'Color', colorSSmixed) % very magenta
+xticks([spacing(1:spacingStep:end), spacing(end)])  
 xticklabels([quantilesConsidered(1:spacingStep:end), quantilesConsidered(end)])
 xlim([min(spacing), max(spacing)]);
-ylim([0, 1.1*max(mean(lengthSubsampledMax))])
-% plot(spacing, mean(lengthSubsampledq,1),'LineWidth', plotLineThickness)
-plot(spacing, mean(lengthSubsampledMixed,1),'-x','LineWidth', plotLineThickness,  'Color', colorSSmixed)
-plot(spacing, mean(lengthSimulatedMax,1),'-d','LineWidth', plotLineThickness,  'Color', colorSimMax)
-plot(spacing, mean(lengthSimulatedMixed,1),'-s','LineWidth', plotLineThickness,  'Color', colorSimMixed)
-plot(spacing, mean(lengthSimulatedMixedT,1),'-p','LineWidth', plotLineThickness,  'Color', colorSimMixedT)
-plot(spacing, mean(lengthIntermediateNormal,1),'--^','LineWidth', plotLineThickness,  'Color', colorInterNormal)
-plot(spacing, mean(lengthIntermediateSS,1),'--v', 'LineWidth', plotLineThickness,  'Color', colorInterSS)
-plot(spacing, mean(lengthNaive,1), '-.+','LineWidth', plotLineThickness,  'Color', colorRaw)
-plot(spacing, mean(lengthDebiased,1),'-..','LineWidth', plotLineThickness,  'Color', colorJW)
- 
-%  ylim([0, 1.5*max(mean(lengthSubsampled,1) )])
- 
+hold on
 
-xlabel('Quantile')
-ylabel('Coverage')
-title(['95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
-    thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
-    num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
-    ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+% Subsampled with r=l, q=qSubsampling
+plot(spacing, mean(lengthSubsampledMixed,1),'-x','LineWidth', plotLineThickness, 'Color', colorSSmax)
+% Simulated using PWM estimator
+plot(spacing, mean(lengthPWMMax,1),'-*', 'LineWidth', plotLineThickness, 'Color', colorSimMixedPWM)
+plot(spacing, mean(lengthPWMMixed,1),'-pentagram', 'LineWidth', plotLineThickness, 'Color', colorSimMixedPWM)
+% Simulated with Hill estimator, only for heavy-tailed distribution
+if j==1
+    plot(spacing, mean(lengthHillMax,1),'-diamond', 'LineWidth', plotLineThickness, 'Color', colorSimMixedHill)
+    plot(spacing, mean(lengthHillMixed,1),'-square', 'LineWidth', plotLineThickness, 'Color', colorSimMixedHill)
+end
+% IVT
+plot(spacing, mean(lengthIntermediateNormal,1),'--^','LineWidth', plotLineThickness, 'Color', colorInterNormal)
+plot(spacing, mean(lengthIntermediateSS,1),'--v','LineWidth', plotLineThickness, 'Color', colorInterSS)
+% Extrapolation
+extrValid = logical(nonEmptyExtrapolation(end, :)); % quantiles for which construction of the interval is possible
+extrLength = mean(lengthExtrapolation,1);
+plot(spacing(extrValid),extrLength(extrValid) ,'--<','LineWidth', plotLineThickness, 'Color', colorExtrapolation)
+% Central
+plot(spacing, mean(lengthNaive,1), '-.+','LineWidth', plotLineThickness, 'Color', colorRaw)
+plot(spacing, mean(lengthDebiased,1),'-..','LineWidth', plotLineThickness, 'Color', colorJW) 
 
-                              
- 
-legend('Subsampling: max only',  'Subsampling: mixed',  ...
-     'Simulated: max only','Simulated: mixed',...
-     'Simulated: mixed with truncation',...
-    'Intermediate: normal', 'Intermediate: Subsampling',...
-     'Central: raw data', 'Central: analytical correction',...
-    'Location', 'best')%, 'Central: true')
+ylim([min(extrLength(extrValid)),max( mean(lengthIntermediateSS,1) )])
+
+if N==2000
+    if j==1 % Account for using the Hill estimator
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Extreme: max, PWM','Extreme: mixed, PWM',...
+            'Extreme: max, Hill', 'Extreme: mixed, Hill',...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    else % No Hill estimator
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Extreme: max, PWM','Extreme: mixed, PWM',...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    end
+end
+   
+
 xlabel('Quantile')
 ylabel('Length')
-title(['Length of 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
-    thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
-    num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
-    ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+if t<3 % Add an alternative naming scheme for noiseless data
+    title(['Length, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
+        ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+else
+    title(['Length, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', noiseless data'])
+end
+
 figureSavingName = ['Figures/allLength',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
     thetaParamNameSave{thetaDistrChoice}, num2str(thetaDistributionParam{thetaDistrChoice}),...
     uParamNameSave{uDistrChoice}, num2str(uDistributionParam{uDistrChoice}) ];
 
 saveas(p,figureSavingName,'epsc');
 
-%% Length (selected)
+%% Interval length (selected)
 
- 
+
+
+
+% Create plot
 if plotQuietly ~= 1
     % Plot
-    p = figure('Renderer', 'painters', 'Position', [50 50 plotW plotH]);
+    p = figure('Renderer', 'painters', 'Position', [50 50 plotWsel plotH]);
 else
-    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 800 350]);% Do not plot
+    p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 plotWsel plotH]);% Do not plot
 end
 
-plot(spacing, mean(lengthSubsampledMax,1),'-o', 'LineWidth', plotLineThickness,  'Color', colorSSmax)
-hold on
-xticks([spacing(1:spacingStep:end), spacing(end)])
+% Start plot, create labels
+plot(spacing, mean(lengthSubsampledMax,1),'-o','LineWidth', plotLineThickness, 'Color', colorSSmixed) % very magenta
+xticks([spacing(1:spacingStep:end), spacing(end)])  
 xticklabels([quantilesConsidered(1:spacingStep:end), quantilesConsidered(end)])
 xlim([min(spacing), max(spacing)]);
-ylim([0, 1.1*max(mean(lengthSubsampledMax))])
-% plot(spacing, mean(lengthSubsampledq,1),'LineWidth', plotLineThickness)
-plot(spacing, mean(lengthSubsampledMixed,1),'-x','LineWidth', plotLineThickness,  'Color', colorSSmixed)
-% plot(spacing, mean(lengthSimulatedMax,1),'-d','LineWidth', plotLineThickness,  'Color', colorSimMax)
-plot(spacing, mean(lengthSimulatedMixed,1),'-s','LineWidth', plotLineThickness,  'Color', colorSimMixed)
-% plot(spacing, mean(lengthSimulatedMixedT,1),'-p','LineWidth', plotLineThickness,  'Color', colorSimMixedT)
-plot(spacing, mean(lengthIntermediateNormal,1),'--^','LineWidth', plotLineThickness,  'Color', colorInterNormal)
-% plot(spacing, mean(lengthIntermediateSS,1),'--v', 'LineWidth', plotLineThickness,  'Color', colorInterSS)
-plot(spacing, mean(lengthNaive,1), '-.+','LineWidth', plotLineThickness,  'Color', colorRaw)
-plot(spacing, mean(lengthDebiased,1),'-..','LineWidth', plotLineThickness,  'Color', colorJW)
- 
-%  ylim([0, 1.5*max(mean(lengthSubsampled,1) )])
- 
+hold on
 
-xlabel('Quantile')
-ylabel('Coverage')
-title(['95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
-    thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
-    num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
-    ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
-
-                              
+% Subsampled with r=l, q=qSubsampling
+plot(spacing, mean(lengthSubsampledMixed,1),'-x','LineWidth', plotLineThickness, 'Color', colorSSmax)
+% Simulated using PWM estimator
+if N==2000
+    plot(spacing, mean(lengthPWMMixed,1),'-pentagram', 'LineWidth', plotLineThickness, 'Color', colorSimMixedPWM)
+end
  
-legend('Subsampling: max only',  'Subsampling: mixed',  ...
-     'Simulated: mixed',...
-    'Intermediate',      'Central: raw data', 'Central: analytical correction',...
-    'Location', 'best')%, 'Central: true')
+% IVT
+interNormal = mean(lengthIntermediateNormal,1);
+interSS = mean(lengthIntermediateSS,1);
+plot(spacing(IVTpossible), interNormal(IVTpossible),'--^','LineWidth', plotLineThickness, 'Color', colorInterNormal)
+plot(spacing(IVTpossible), interSS(IVTpossible),'--v','LineWidth', plotLineThickness, 'Color', colorInterSS)
+% Extrapolation
+extrValid = logical(nonEmptyExtrapolation(end, :)); % quantiles for which construction of the interval is possible
+extrLength = mean(lengthExtrapolation,1);
+plot(spacing(extrValid),extrLength(extrValid) ,'--<','LineWidth', plotLineThickness, 'Color', colorExtrapolation)
+% Central
+plot(spacing, mean(lengthNaive,1), '-.+','LineWidth', plotLineThickness, 'Color', colorRaw)
+plot(spacing, mean(lengthDebiased,1),'-..','LineWidth', plotLineThickness, 'Color', colorJW) 
+
+ylim([min(extrLength(extrValid)),max( mean(lengthIntermediateSS,1) )])
+
+if N==2000
+    if j==1 % Account for using the Hill estimator
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Extreme: mixed, PWM',...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    else % No Hill estimator
+        legend('Extreme: max, subsampling',  'Extreme: mixed, subsampling',  ...
+            'Extreme: mixed, PWM',...
+            'Intermediate: normal', 'Intermediate: Subsampling','Intermediate: extrapolation',...
+            'Central: raw data', 'Central: analytical correction',...
+            'Location', 'southwest')%, 'Central: true')
+    end
+end
+   
+
 xlabel('Quantile')
 ylabel('Length')
-title(['Length of 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
-    thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
-    num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
-    ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+if t<3 % Add an alternative naming scheme for noiseless data
+    title(['Length, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
+        ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice}) ])
+else
+    title(['Length, 95% CI for quantiles, N=', num2str(N), ',T=', num2str(T), ', F=', ...
+        thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+        num2str(thetaDistributionParam{thetaDistrChoice}), ', noiseless data'])
+end
+
 figureSavingName = ['Figures/selectedLength',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
     thetaParamNameSave{thetaDistrChoice}, num2str(thetaDistributionParam{thetaDistrChoice}),...
     uParamNameSave{uDistrChoice}, num2str(uDistributionParam{uDistrChoice}) ];
 
 saveas(p,figureSavingName,'epsc');
+ 
+ 
 
 %% MAE of corrected estimators
 
 % Use raw sample quantiles
-refV = mean(abs(errorSimple));
 
+refV = mean(abs(errorSimple));
 if plotQuietly ~= 1
     % Plot
     p = figure('Renderer', 'painters', 'Position', [50 50 plotW plotHMae]);
 else
     p = figure('visible','off', 'Renderer', 'painters', 'Position', [50 50 800 350]);% Do not plot
 end
+
+% First plot: zoomed in
 subplot(2, 1, 1)
-plot(spacing, mean(abs(errorCorrectedMax)./refV, 1) ,'-o', 'Color', colorSSmax)
+semilogy(spacing, mean(abs(errorCorrectedMax)./refV, 1) ,'-o','LineWidth', plotLineThickness, 'Color', colorSSmixed)
 hold on 
 xlim([min(spacing), max(spacing)]);
 xticks([spacing(1:spacingStep:end), spacing(end)])
 xticklabels([quantilesConsidered(1:spacingStep:end), quantilesConsidered(end)])
+plot(spacing, mean(abs(errorCorrectedMixed)./refV, 1), '-x','LineWidth', plotLineThickness, 'Color', colorSSmax)
+plot(spacing, mean(abs(errorCorrectedPWMMixed)./refV, 1),'-pentagram','LineWidth', plotLineThickness, 'Color', colorSimMixedPWM)
+if j==1 % For heavy-tailed distribution pot
+    plot(spacing, mean(abs(errorCorrectedHillmixed)./refV, 1),'-s','LineWidth', plotLineThickness, 'Color', colorSimMixedHill)
+end
+plot(spacing, mean(abs(errorExtrapolation)./refV, 1),'--<','LineWidth', plotLineThickness, 'Color', colorExtrapolation)
+plot(spacing, mean(abs(errorCorrectedJW)./refV, 1),'-..', 'LineWidth', plotLineThickness,'Color', colorJW);
+
 ylim([0.5, 2])
-plot(spacing, mean(abs(errorCorrectedMixed)./refV, 1), '-x', 'Color', colorSSmixed)
-plot(spacing, mean(abs(errorCorrectedSIMMax)./refV, 1),'-d', 'Color', colorSimMax)
-plot(spacing, mean(abs(errorCorrectedSIMMixed)./refV, 1),'-s', 'Color', colorSimMixed)
-plot(spacing, mean(abs(errorCorrectedJW)./refV, 1),'-..', 'Color', colorJW);
 
 yline(1);
 xlabel('Quantile')
 ylabel('Relative MAE')
 
+% Second plot: zoomed out
 subplot(2, 1, 2)
-plot(spacing, mean(abs(errorCorrectedMax)./refV, 1) ,'-o', 'Color', colorSSmax)
+semilogy(spacing, mean(abs(errorCorrectedMax)./refV, 1) ,'-o','LineWidth', plotLineThickness, 'Color', colorSSmixed)
 hold on 
 xlim([min(spacing), max(spacing)]);
 xticks([spacing(1:spacingStep:end), spacing(end)])
 xticklabels([quantilesConsidered(1:spacingStep:end), quantilesConsidered(end)])
-ylim([0.5, 15])
-plot(spacing, mean(abs(errorCorrectedMixed)./refV, 1), '-x', 'Color', colorSSmixed)
-plot(spacing, mean(abs(errorCorrectedSIMMax)./refV, 1),'-d', 'Color', colorSimMax)
-plot(spacing, mean(abs(errorCorrectedSIMMixed)./refV, 1),'-s', 'Color', colorSimMixed)
- plot(spacing, mean(abs(errorCorrectedJW)./refV, 1),'-..', 'Color', colorJW);
+plot(spacing, mean(abs(errorCorrectedMixed)./refV, 1), '-x','LineWidth', plotLineThickness, 'Color', colorSSmax)
+plot(spacing, mean(abs(errorCorrectedPWMMixed)./refV, 1),'-pentagram','LineWidth', plotLineThickness, 'Color', colorSimMixedPWM)
+if j==1 % For heavy-tailed distribution pot
+    plot(spacing, mean(abs(errorCorrectedHillmixed)./refV, 1),'-s','LineWidth', plotLineThickness, 'Color', colorSimMixedHill)
+end
+plot(spacing, mean(abs(errorExtrapolation)./refV, 1),'--<','LineWidth', plotLineThickness, 'Color', colorExtrapolation)
+plot(spacing, mean(abs(errorCorrectedJW)./refV, 1),'-..', 'LineWidth', plotLineThickness,'Color', colorJW);
+
 xlabel('Quantile')
 ylabel('Relative MAE')
 yline(1);
-legend( 'Subsampling: max only', 'Subsampling: mixed', ...
-    'Simulated: max only', 'Simulated: mixed',...
-     'Central: analytical correction',...
-       'Location', 'southwest')
+
+if N==2000
+    if j==1
+        legend( 'Extreme: max, subsampling', 'Extreme: mixed, subsampling', ...
+            'Extreme: mixed, PWM', 'Extreme: mixed, Hill',...
+            'Intermediate: extrapolation',...
+            'Central: analytical correction',...
+            'Location', 'southwest')
+        
+    else
+        legend( 'Extreme: max, subsampling', 'Extreme: mixed, subsampling', ...
+            'Extreme: mixed, PWM',  ...
+            'Intermediate: extrapolation',...
+            'Central: analytical correction',...
+            'Location', 'southwest')
+        
+    end
+end
+
 
    
 xlabel('Quantile')
-
-suptitle({'MAE of corrected estimators, relative to raw sample quantile', ...
-     ['N=', num2str(N), ',T=', num2str(T), ', F=', ...
-    thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
-    num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
-    ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice})]})
-
-
+ 
+    if t==3
+        suptitle({'MAE of corrected estimators, relative to raw sample quantile', ...
+            ['N=', num2str(N), ',T=', num2str(T), ', F=', ...
+            thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+            num2str(thetaDistributionParam{thetaDistrChoice}), ', noiseless data']})
+    else
+        suptitle({'MAE of corrected estimators, relative to raw sample quantile', ...
+            ['N=', num2str(N), ',T=', num2str(T), ', F=', ...
+            thetaName{thetaDistrChoice},', ', thetaParamName{thetaDistrChoice}, '=',...
+            num2str(thetaDistributionParam{thetaDistrChoice}), ', u_{it}~', uName{uDistrChoice},...
+            ', ', uParamName{uDistrChoice},'=', num2str(uDistributionParam{uDistrChoice})]})
+    end
+ 
  
 figureSavingName = ['Figures/mae',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
     thetaParamNameSave{thetaDistrChoice}, num2str(thetaDistributionParam{thetaDistrChoice}),...
