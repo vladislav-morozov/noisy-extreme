@@ -1,45 +1,19 @@
-    
-%% Simulations for 
-% Last updated: 10.10.2024
-
-
-% RNG
-rng(1,'multFibonacci')
- 
-
-% Sample sizes
-N = 200;    
-% T is set below when calling the simulation file
-Tmult = 1; % the exponent multiplying default T sizes
-
-% Simulation parameters
-alphaCI = 0.05; % CI
-% quantilesConsidered = [0.85, 0.9  , 0.95:0.005:0.99, 0.9905:0.00025:0.999999]; % quantiles considered
-
-qSubsampling=2; % statistic for feasible EVT 
-qSimulation = 3;
-sC = 1; % tuning parameter for central variance estimations
-nSamples = 10000; % number of replication samples
-nSubsamples = 1e4; % number of subsamples   
-nBootstrap = 1e3        ; % number of bootstrap samples
-% Number of covariates
-constantIncluded = 1;
-numCov = 3;
-
-% Generating process for (x, theta)
-sigmaSqX = 1; % variance of x
-rhoTheta = 0.5; % correlation between coordinates of theta
-rhoXtheta = 0.5; % x is generated as rhoXtheta*theta+(1+rhoXtheta*||theta||)*sigmaSqX*Distr of X
-
-
-% Other parameters
-plotQuietly = 0; % export figures without opening them
-saveResults = 1;
-spacingExponent= 1.2;
-
-
- 
-%% Data drawing process
+% ===========================================================
+% File: chooseDGP.m
+% Description: This script implements the data generating processes for the
+% unobserved coefficients theta and the unobserved shocks u. It also
+%
+% Model:
+%
+%
+% Project Name: Inference on Extreme Quantiles of Unobserved 
+%               Individual Heterogeneity
+% Developed by: Vladislav Morozov
+%
+% Implemented DGPs: "unimodal", "bimodal", "bimodal_close"
+% If a list of DGPs is supplied, all of them will be ran in turn.
+% ===========================================================
+%%  Distributions for thetas
 % All parameters have to be specified first
 
 % Marginals for theta
@@ -69,7 +43,7 @@ gammaSign{2}=0;
 gammaSign{3}=-1;
 
 
-% Quantiles considered
+%% Quantiles considered
 quantilesConsideredArray{1} = [0.9:0.005:0.99, 0.9905:0.0005:0.999]; % this kills the 0.85 quantile
 quantilesConsideredArray{2} = [0.9, 0.9:0.005:0.99, 0.9905:0.0005:0.999];
 quantilesConsideredArray{3} = [0.9, 0.9:0.005:0.99, 0.9905:0.0005:1]; % Finite endpoint
@@ -107,55 +81,12 @@ uParamNameSave{2} = 'beta';
 uParamNameSave{3} = '';
 
 
-%% Simulate
+%% X
+% Number of covariates
+constantIncluded = 1;
+numCov = 3;
 
-for j=3:3
-    for t=1:3
-        % 
-        thetaDistrChoice = j;
-        uDistrChoice = t;
-        if j==1
-            T= Tmult*10;
-        else
-            T = Tmult*15;
-        end
-        noisyExtreme_SimulateCoverages
-    end
-end
-
-
-%% Recompute intermediate intervals
-
-
-for j=1:3
-    for t=1:3
-        % 
-        thetaDistrChoice = j;
-        uDistrChoice = t;
-        if j==1
-            T= Tmult*10;
-        else
-            T = Tmult*15;
-        end
-        noisyExtreme_simulateIntermediate
-    end
-end
-
-
-%% Export plots
-
-for j=1:3
-    for t=1:3
-        thetaDistrChoice = j;
-        uDistrChoice = t;
-        if j==1
-            T= Tmult*10;
-        else
-            T = Tmult*15;
-        end
-        noisyExtreme_exportPlots
-    end
-end
-beep
-
-
+% Generating process for (x, theta)
+sigmaSqX = 1; % variance of x
+rhoTheta = 0.5; % correlation between coordinates of theta
+rhoXtheta = 0.5; % x is generated as rhoXtheta*theta+(1+rhoXtheta*||theta||)*sigmaSqX*Distr of X

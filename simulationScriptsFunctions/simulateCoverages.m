@@ -1,4 +1,5 @@
-%% Main loop
+
+%% Extract chosen 
 % Select generating processes and insert all parameters
 thetaSampler = thetaDistribution{thetaDistrChoice};
 thetaSampler = @(u) thetaSampler(thetaDistributionParam{thetaDistrChoice}, u);
@@ -127,7 +128,7 @@ parfor s=1:nSamples % loop over samples
     % Draw coefficients and data in a potentially correlated
     % manner
     [y, x, betaS, ~] = ...
-        noisyExtreme_linearModelDrawData(N, T, constantIncluded, numCov, ...
+        linearModelDrawData(N, T, constantIncluded, numCov, ...
         thetaSampler, uSampler, sigmaSqX, rhoTheta, rhoXtheta);
     thetaS = betaS(:, 2); % second coordinate
     thetaSorted =sort(thetaS);
@@ -397,9 +398,9 @@ end
 
 %% save
 
-if saveResults == 1
-    fileName = ['Outputs/',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
+ 
+    fileName = ['outputs/',num2str(nSamples),'N', num2str(N), 'T', num2str(T), 'F', thetaNameSave{thetaDistrChoice},...
         thetaParamNameSave{thetaDistrChoice}, num2str(thetaDistributionParam{thetaDistrChoice}),...
         uParamNameSave{uDistrChoice}, num2str(uDistributionParam{uDistrChoice}),'.mat' ];
     save(fileName)
-end
+ 
