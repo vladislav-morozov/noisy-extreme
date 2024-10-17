@@ -1,11 +1,3 @@
-%% Loop through DGPs
-
-% Create combinations of DGPs and (N, T)
-
-% Loop through combination ids
-
-
-
 
 %% Extract chosen data generating processes for coefficients and shocks 
 

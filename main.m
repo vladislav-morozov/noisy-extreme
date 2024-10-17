@@ -38,9 +38,11 @@ clear variables
 close all
 
 % Load the required folders
+addpath('classes') 
 addpath('config') 
+addpath('confidenceIntervals')
 addpath('simulationScriptsFunctions') 
-
+addpath('utilities') % further useful scripts 
 %% Simulation configuration
  
 % Set the random number generator

@@ -1,4 +1,4 @@
-function [y, x, thetaS, u] =noisyExtreme_linearModelDrawData(N, T, constantIncluded, numCov, thetaSampler, uSampler, sigmaSqX, rhoTheta, rhoXtheta) 
+function [y, x, thetaS, u] = linearModelDrawData(N, T, constantIncluded, numCov, thetaSampler, uSampler, sigmaSqX, rhoTheta, rhoXtheta) 
 % noisyExtreme_linearModelDrawData Draw data from linear model y=theta'*x
 % Data format -- TxN, rows index time, N indexes units
 
