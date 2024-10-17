@@ -1,6 +1,14 @@
 classdef dataSampler
+    %DATASAMPLE Value class
     properties
-        % Class properties
+       distrMachineName;
+       distrLegendName;
+       paramMachineName;
+       paramLegendName;
+       paramValue
+       gammaSign;
+       finiteLeftEndpoint;
+       finiteRightEndpoint;
     end
 
     methods
@@ -8,7 +16,7 @@ classdef dataSampler
             % Constructor code here
         end
 
-        function runSimulation(this)
+        function sample = generateSamples(this)
             % Simulation code here
         end
     end
