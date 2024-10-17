@@ -1,5 +1,5 @@
 % ===========================================================
-% File: chooseDGP.m
+% File: setDGP.m
 % Description: This script implements the data generating processes for the
 % unobserved coefficients theta and the unobserved shocks u. It also
 %
