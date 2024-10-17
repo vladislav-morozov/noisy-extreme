@@ -13,6 +13,8 @@
 % Implemented DGPs: "unimodal", "bimodal", "bimodal_close"
 % If a list of DGPs is supplied, all of them will be ran in turn.
 % ===========================================================
+
+
 %%  Distributions for thetas
 % All parameters have to be specified first
 

@@ -7,14 +7,12 @@
 %
 %
 % Description:
-%   This script runs the main simulation for the project "Project Title".
-%   It calls all required functions and scripts to perform the necessary
-%   computations and generate the results.
+%   This script runs the simulations on confidence intervals for extreme
+%   quantiles. 
 %
 %
-% Link to paper: https://arxiv.org/abs/2210.14205
+% Link to paper:  
 % Link to the appendix: 
-% https://vladislav-morozov.github.io/files/1_unitAveragingSupplement.pdf
 % 
 %
 % MATLAB Version:
@@ -22,8 +20,7 @@
 % 
 %
 % Instructions:
-%   - Ensure that all required data files are located in the 'data' folder.
-%   - Ensure that all required functions are located in the 'src' folder.
+%   - Ensure that
 %   - Run this script to execute the entire simulation.
 %
 % Outputs:
@@ -31,17 +28,8 @@
 %   - Figures and plots are saved in the 'results/figures' folder.
 %
 %
-%
-% Paper URL:
-%   https://arxiv.org/abs/2210.08524
-% Supplementary appendix:
-%
-% Project URL:
-%   Add a link to your project repository or documentation.
-
-
 % Last updated: 10.10.2024
-
+% ===========================================================
 %% Initialization
 
 % Clear workspace
