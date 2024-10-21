@@ -4,4 +4,4 @@
 *.eps
 *.mat
 *.asv
-uaSampleAveraging.prj
+tests/*
