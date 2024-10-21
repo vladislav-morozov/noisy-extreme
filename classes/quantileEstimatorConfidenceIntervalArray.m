@@ -1,4 +1,15 @@
-classdef quantileEstimatorConfidenceIntervalArray < handle
+% ===========================================================
+% File: quantileEstimatorConfidenceIntervalArray.m
+% Description: This file implements a value class for confidence intervals
+% and quantile estimators. The class is capable of handling a vector of
+% quantiles.
+%
+% Project Name: Inference on Extreme Quantiles of Unobserved 
+%               Individual Heterogeneity
+% Developed by: Vladislav Morozov
+% ===========================================================
+
+classdef quantileEstimatorConfidenceIntervalArray 
     %quantileEstimatorConfidenceIntervalArray A class for arrays of 
     % quantile estimators and confidence intervals.
     % Supports evaluating length, coverage, and custom methods for 
@@ -15,6 +26,8 @@ classdef quantileEstimatorConfidenceIntervalArray < handle
                                  % e.g., "extremeSubsampling"
         legendName;              % Mame using for plotting
                                  % e.g., "Extreme approx. (w/ subsampling)"
+        plottingColor;           % RGB triplet for line color
+        plottingLineStyle;       % Line type and markers for plotting
         targetQuantiles;         % Row vector of target quantiles, 
                                  % Created during fitting
         fittedQuantileEst;       % |targetQuantiles|-vector (row) of 
@@ -25,15 +38,17 @@ classdef quantileEstimatorConfidenceIntervalArray < handle
                                  % First row -- lower bound
                                  % Second row -- upper bound
                                  % Created during fitting
+                                 
     end
 
     methods
         % Constructor
         function ciArray = ...
                 quantileEstimatorConfidenceIntervalArray(...
-                fit, machineReadableName, legendName ...
+                fit, machineReadableName, legendName, ...
+                plottingColor, plottingLineStyle ...
                 )
-            %quantileEstimatorConfidenceIntervalArray Construct an instance  
+            %quantileEstimatorConfidenceIntervalArray    
             %  Initializes target quantiles, default estimators and CIs,
             %  and sets the specified names.
 
@@ -53,12 +68,16 @@ classdef quantileEstimatorConfidenceIntervalArray < handle
             % Set names
             ciArray.machineReadableName = machineReadableName;
             ciArray.legendName = legendName;
+
+            % Set plotting parameters
+            ciArray.plottingColor = plottingColor;
+            ciArray.plottingLineStyle = plottingLineStyle;
         end
 
         % Method for fitting the CI
-        function this = computeEstimatorsIntervals(...
+        function this = fit(...
                 this, dataVector, targetQuantiles)
-            %computeEstimatorsIntervals Fits the corrected estimators and 
+            % FIT Fits the corrected estimators and 
             % confidence intervals. Uses the fit function to compute both
             % based on data vector dataVector and chosen targetQuantiles
 
@@ -77,8 +96,8 @@ classdef quantileEstimatorConfidenceIntervalArray < handle
         end
 
         % Method for checking whether the interval contains target values
-        function containsTargets = checkCoverage(this, trueQuantileValues)
-            %CHECKCOVERAGE Checks if the fitted CIs cover the true
+        function containsTargets = computeCoverage(this, trueQuantileValues)
+            %COMPUTECOVERAGE Checks if the fitted CIs cover the true
             % quantiles. Returns a Boolean vector indicating coverage for
             % each target quantile. trueQuantiles must be the quantiles in
             % this.targetQuantiles.
@@ -97,12 +116,6 @@ classdef quantileEstimatorConfidenceIntervalArray < handle
 
             errorEstimator = this.fittedQuantileEst-trueQuantileValues;
         end
-
-        % Destructor
-        function delete(~)
-            %DELETE Destructor for the 
-            % quantileEstimatorConfidenceIntervalArray class
  
-        end
     end
 end
