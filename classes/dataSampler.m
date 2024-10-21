@@ -9,8 +9,8 @@
 %
 % ===========================================================
 
-classdef dataSampler
-    %DATASAMPLER Class for sampling from one-dimensional distributions
+classdef dataSampler 
+    % DATASAMPLER Class for sampling from one-dimensional distributions
     %controlled by 1 parameter. Value class
 
     properties
@@ -28,6 +28,7 @@ classdef dataSampler
        finiteRightEndpoint   % Whether the right endpoint is finite 
        gammaSignLeft;        % Sign of EV index for the left tail  
        finiteLeftEndpoint;   % Whether the left endpoint is finite 
+       scale;                % Variance x relative to base of distrInverse
     end
 
     methods
@@ -37,7 +38,7 @@ classdef dataSampler
                 paramValue, ...
                 gammaSignRight, finiteRightEndpoint, ...
                 gammaSignLeft, finiteLeftEndpoint)
-            %DATASAMPLER Constructs an instance of dataSampler using
+            % DATASAMPLER Constructs an instance of dataSampler using
             % specified parameter values. If no values are given regarding
             % the left endpoint parameters, those are set to NaN
 
@@ -50,11 +51,12 @@ classdef dataSampler
             sampler.paramValue = paramValue;
             sampler.gammaSignRight = gammaSignRight;
             sampler.finiteRightEndpoint = finiteRightEndpoint;
+            sampler.scale = 1;
 
             % Set left tail parameters to NaN if not provided
             if nargin < 10
                 sampler.gammaSignLeft = NaN;
-                sampler.finiteLeftEndpoint = NaN;                
+                sampler.finiteLeftEndpoint = NaN;       
             else
                 sampler.gammaSignLeft = gammaSignLeft;
                 sampler.finiteLeftEndpoint = finiteLeftEndpoint;
@@ -63,14 +65,34 @@ classdef dataSampler
         
         % Method for drawing samples from this instance
         function rand_sample = sample(this, numSamples)
-            %SAMPLE Draws numSamples iid observations using the
+            % SAMPLE Draws numSamples iid observations using the
             % distrInverse with the specified paramValue
 
             % Draw a uniform sample
-            unifSample = rand(numSamples, 1);
+            unifSample = rand(numSamples);
 
             % Take the integral transform to obtain the sample of interest
-            rand_sample = this.distrInverse(unifSample, this.paramValue);
+            rand_sample = this.distrInverse(unifSample, this.paramValue)*...
+                this.scale;
+        end
+
+        % Method for updating sample to match a given variance to a given
+        % sampler
+        function this = calibrateVariance(this, targetSampler)
+            % CALIBRATEVARIANCE Changes distrInverse to have the same
+            % variance as targetSampler
+
+            % Compute variances
+            varTarget = var(targetSampler.sample([300000, 1]));
+            varCurrent = var(this.sample([300000, 1]));
+
+            % Modify the variance
+            if varCurrent>0  
+                this.scale = this.scale*sqrt(varTarget/varCurrent);
+            end
+            
+
+
         end
 
     end
