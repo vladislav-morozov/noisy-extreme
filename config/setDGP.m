@@ -1,19 +1,50 @@
 % ===========================================================
 % File: setDGP.m
 % Description: This script implements the data generating processes for the
-% unobserved coefficients theta and the unobserved shocks u. It also
-%
-% Model:
-%
+% unobserved coefficients theta and the unobserved shocks u. 
+% 
+% Notes:
+%  1. Each DGP must be an instance of the dataSampler class
+%  2. Names of theta distributions must start with thetaSampler; names of
+%     shocks distributions must start with uSampler.  
+%  3. All of the DGPs with appropriate names will be used for simulations.
 %
 % Project Name: Inference on Extreme Quantiles of Unobserved 
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
-%
-% Implemented DGPs: "unimodal", "bimodal", "bimodal_close"
-% If a list of DGPs is supplied, all of them will be ran in turn.
 % ===========================================================
 
+%% Theta: Frechet distribution
+
+% Set quantile function and parameter value to use
+frechetQuantiles = @(u, kappa) frechetInverse(u, kappa);
+frechetParam = 4; % approximately four finite moments
+
+% Create instance
+thetaSamplerFrechet = dataSampler(frechetQuantiles, ...
+    "frechet", 'F_{Fr, \kappa}', ...
+    "kappa", "\kappa", frechetParam, ...
+    1, false); % infinite right tail
+
+%% Shocks: two-sided Frechet (G_beta) distribution
+
+% Set quantile function and parameter value to use
+gBetaInverse = @(u, beta) twoSidedPowerInverse(u, beta);
+gBetaParam = 8; % 8 finite moments for the noise
+
+% Create instance 
+uSamplerGBeta = dataSampler(gBetaInverse, ...
+    "GBeta", 'G_{\kappa}', ...
+    "beta", "\beta", gBetaParam, ...
+    1, false); % infinite right tail
+
+%% Collect distributions into cell arrays
+
+% Collect all defined distributions for theta
+thetaDistrsArray = findAndCollect('thetaSampler');
+
+% Collect all defined distributions for u
+uDistrsArray = findAndCollect('uSampler');
 
 %%  Distributions for thetas
 % All parameters have to be specified first
@@ -83,12 +114,4 @@ uParamNameSave{2} = 'beta';
 uParamNameSave{3} = '';
 
 
-%% X
-% Number of covariates
-constantIncluded = 1;
-numCov = 3;
-
-% Generating process for (x, theta)
-sigmaSqX = 1; % variance of x
-rhoTheta = 0.5; % correlation between coordinates of theta
-rhoXtheta = 0.5; % x is generated as rhoXtheta*theta+(1+rhoXtheta*||theta||)*sigmaSqX*Distr of X
+ 
