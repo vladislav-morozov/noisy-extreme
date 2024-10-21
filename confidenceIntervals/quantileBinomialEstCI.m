@@ -1,7 +1,7 @@
 function [quantileEst, quantileCIs] = quantileBinomialEstCI(...
                     dataVector, q, alphaCI, sorted...
                     )
-    %QUANTILEBINOMIALCI Computes the qth sample quantile by interpolation 
+    % QUANTILEBINOMIALCI Computes the qth sample quantile by interpolation 
     %   and returns a binomial (1-alpha)x100% confidence interval.
     %   q can be a row vector.
     %
