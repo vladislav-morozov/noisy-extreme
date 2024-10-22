@@ -44,26 +44,48 @@ methodCentralJW = ...
     jwColor, jwLine); 
 
 
-%% Extreme: subsampling with denominator tuning parameter q fixed
-% number subsamples, numerator and denominator tuning parametesr
+%% Extreme: subsampling with denominator tuning parameter (q) fixed
+% Subsample sizes are chosen using the minimum volatility method
 
+% Choose reference value for denominator parameter
+subsamplingQ = 5;
 % Fitting function
-fixExtrFixedQ
-extremeSubsamplingEstCI(alphaCI, thetaEsts, 'sample', 60, ...
-            100, targetQuantiles)
+fitExtrFixedQ = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSamples) ...
+    extremeSubsamplingEstCI(thetaEsts, targetQuantiles, alphaCI, ...
+    subsamplingQ, 'MV', numSubsamples);
+ 
 
 % Plotting parameters
 subsamplingFixedDenomColor = [222, 7, 7]/255;  
 subsamplingFixedDenomLine = '-o';
 
 % Instantiate
-methodExtremeSubsampling = ...
+methodExtremeSubsampFixedQ = ...
     quantileEstimatorConfidenceIntervalArray(fitJW, ...
     'extrFixedQ', 'Extreme: subsampling, fixed-q', ...
-    subsamplingFixedDenom, subsamplingFixedDenomLine); 
+    subsamplingFixedDenomColor, subsamplingFixedDenomLine); 
 
 
-%% Extreme: subsampling with denominator tuning parameter matching numerator 
+%% Extreme: subsampling with denominator parameter (q) matching numerator 
+% The parameter q in the denominator tracks the corresponding sample
+% quantile down to a minimum of q=1 (to prevent division by 0)
+
+% Fitting function
+fitExtrSampleQ = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSamples) ...
+    extremeSubsamplingEstCI(thetaEsts, targetQuantiles, alphaCI, ...
+    'Sample', 'MV', numSubsamples);
+ 
+
+% Plotting parameters
+subsamplingSampleDenomColor = [0.99, 0.03, 1]; 
+subsamplingSampleDenomLine = '-x';
+
+% Instantiate
+methodExtremeSubsampSampleQ = ...
+    quantileEstimatorConfidenceIntervalArray(fitJW, ...
+    'fitExtrSampleQ', 'Extreme: subsampling, q=l', ...
+    subsamplingSampleDenomColor, subsamplingSampleDenomLine); 
+
 
 %% Extreme: simulation with PWM estimator
 
