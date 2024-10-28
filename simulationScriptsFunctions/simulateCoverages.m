@@ -41,7 +41,8 @@ for dgpID = 1:height(dgps)
     end
 
     % Compute the true quantiles
-    trueQuantileVals = thetaSampler.distrInverse(targetQuantilesDGP, thetaSampler.paramValue);
+    trueQuantileVals = ...
+        thetaSampler.distrInverse(targetQuantilesDGP, thetaSampler.paramValue);
 
     % Create temporary arrays, these will be inserted into results arrays
     ciCoversTemp = NaN(numSamples, length(targetQuantilesDGP), numMethods);
@@ -61,10 +62,9 @@ for dgpID = 1:height(dgps)
         % Draw Monte Carlo samples: simulation computations go here
         
         % Create bar to visualize progress
-        queue = parallel.pool.DataQueue;
-        parallelProgressBar(queue, numSamples);
+        progressQueue = createParallelProgressBar(numSamples);
 
-        parfor sampleID = 1:numSamples
+        parfor sampleID = 1:numSamples % 
             % Draw data
             [y, x, coefsTrue, ~] = ...
                 linearModelDrawData(N, T, constantIncluded, numCov, ...
@@ -99,9 +99,7 @@ for dgpID = 1:height(dgps)
 
             end
             % Send a message to update the progress bar
-            send(queue, sampleID);
-            disp(sampleID)
-
+            send(progressQueue, sampleID);
 
         end
 
@@ -121,6 +119,5 @@ for dgpID = 1:height(dgps)
             num2str(uSampler.paramValue),...
             '.mat' ];
         save(strjoin(fileName, ''))
-     
     end
 end

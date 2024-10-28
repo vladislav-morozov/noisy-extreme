@@ -4,4 +4,4 @@
 *.eps
 *.mat
 *.asv
-tests/*
+z_old/*

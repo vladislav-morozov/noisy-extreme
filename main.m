@@ -91,7 +91,7 @@ qSubsampling=2; % statistic for feasible EVT
 qSimulation = 3;
 sC = 1; % tuning parameter for central variance estimations
 numSamples = 100; % number of replication samples
-nSubsamples = 1e4; % number of subsamples   
+numSubsamples = 1e4; % number of subsamples   
 numBootstrapSamples = 1e3        ; % number of bootstrap samples
 
 

@@ -1,4 +1,6 @@
-function [jwEst, jwInt] = jwCorrectedEstCI(thetaEsts, targetQuantiles, alphaCI, varEsts, T, numBootstrapSamples)
+function [jwEst, jwInt] = ...
+    jwCorrectedEstCI(thetaEsts, targetQuantiles, alphaCI, varEsts, ...
+    T, numBootstrapSamples)
 % JWCORRECTEDESTCI Computes the Jochmans, Weidner (2024) corrected
 % estimator for target quantiles and returns a (1-alphaCI) bootstrap
 % confidence interval.

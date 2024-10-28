@@ -10,14 +10,14 @@ plotHall = 400;
 plotH = 270;
 plotHMae = 700;
 % Specify colors
-colorSSmax= [0.99, 0.03, 1];  % subsampled with r=0
+% colorSSmax= [0.99, 0.03, 1];  % subsampled with r=0
 % colorSSmixed = [222, 7, 7]/255; % subsampled with r=l
 colorSimMax = [0.03,0.99, 0.99];
 colorSimMaxHill = [60, 103, 161]/255; % Hill
 colorSimMixedHill = [3, 103, 161]/255; % Hill
-colorSimMaxPWM = [60, 16, 97]/255; % PWM
+% colorSimMaxPWM = [60, 16, 97]/255; % PWM
 colorSimMixedPWM = [2, 16, 97]/255; % PWM
-colorInterNormal = [227, 207, 30]/255; % IVT with normal quantiles
+% colorInterNormal = [227, 207, 30]/255; % IVT with normal quantiles
 colorInterSS = [230, 187, 46]/255; % IVT with subsampling
 colorExtrapolation = [255, 165,0]/255; % Extrapolation
 % colorRaw = [46, 230, 46]/255;

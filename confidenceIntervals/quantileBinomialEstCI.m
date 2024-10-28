@@ -33,7 +33,8 @@ function [quantileEst, quantileCIs] = quantileBinomialEstCI(...
     dataVector(N+2) = dataVector(N);
     
     % Compute the qth quantile by linear interpolation
-    quantileEst = dataVector(r) + f' .* (dataVector(r + 1) - dataVector(r));
+    quantileEst = ...
+        dataVector(r) + f' .* (dataVector(r + 1) - dataVector(r));
     % Ensure that a row vector is returned
     if ~isrow(quantileEst)
         quantileEst = quantileEst';
@@ -44,8 +45,10 @@ function [quantileEst, quantileCIs] = quantileBinomialEstCI(...
     u = binoinv(1 - alphaCI, N, q);
     
     % Adjustments for confidence intervals
-    g = (alphaCI - binocdf(t, N, q)) ./ (binocdf(t + 1, N, q) - binocdf(t, N, q));
-    h = (alphaCI - 1 + binocdf(u, N, q)) ./ (binocdf(u, N, q) - binocdf(u - 1, N, q));
+    g = (alphaCI - binocdf(t, N, q)) ./ ...
+        (binocdf(t + 1, N, q) - binocdf(t, N, q));
+    h = (alphaCI - 1 + binocdf(u, N, q)) ./...
+        (binocdf(u, N, q) - binocdf(u - 1, N, q));
     
     % Compute the lower and upper bounds of the confidence intervals
     cl = dataVector(t + 1) + g' .* (dataVector(t + 2) - dataVector(t + 1));
