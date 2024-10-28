@@ -61,7 +61,7 @@ subsamplingFixedDenomLine = '-o';
 
 % Instantiate
 methodExtremeSubsampFixedQ = ...
-    quantileEstimatorConfidenceIntervalArray(fitJW, ...
+    quantileEstimatorConfidenceIntervalArray(fitExtrFixedQ, ...
     'extrFixedQ', 'Extreme: subsampling, fixed-q', ...
     subsamplingFixedDenomColor, subsamplingFixedDenomLine); 
 
@@ -82,16 +82,53 @@ subsamplingSampleDenomLine = '-x';
 
 % Instantiate
 methodExtremeSubsampSampleQ = ...
-    quantileEstimatorConfidenceIntervalArray(fitJW, ...
+    quantileEstimatorConfidenceIntervalArray(fitExtrSampleQ, ...
     'fitExtrSampleQ', 'Extreme: subsampling, q=l', ...
     subsamplingSampleDenomColor, subsamplingSampleDenomLine); 
 
 
-%% Extreme: simulation with PWM estimator
+%% Extreme: simulated critical values with the PWM EV index estimator
+% This method uses the same denominatorParam as the subsampling method with
+% fixed-q
 
-%% Intermediate approximations
+% Fitting function
+fitExtrFixedQSim = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSamples) ...
+    extremeSimulationEstCI(thetaVector, targetQuantiles, alphaCI, ...
+        subsamplingQ, numBootstrapSamples);
 
+ 
+
+% Plotting parameters
+subsamplingFixedDenomSimColor = [60, 16, 97]/255;
+subsamplingFixedDenomSimLine = ''-pentagram';
+
+% Instantiate
+methodExtremeSubsampFixedQ = ...
+    quantileEstimatorConfidenceIntervalArray(fitExtrFixedQSim, ...
+    'extrFixedQSim', 'Extreme: simulated (PWM), fixed-q', ...
+    subsamplingFixedDenomSimColor, subsamplingFixedDenomSimLine); 
+
+
+
+%% Intermediate: asymptotic normality
+
+% Fitting function
+fitIntermediateNormal = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSamples) ...
+    extremeSimulationEstCI(thetaVector, targetQuantiles, alphaCI, ...
+        subsamplingQ, numBootstrapSamples);
+
+ 
+
+% Plotting parameters
+subsamplingFixedDenomSimColor = [60, 16, 97]/255;
+subsamplingFixedDenomSimLine = ''-pentagram';
+
+% Instantiate
+methodIntermediateNormal = ...
+    quantileEstimatorConfidenceIntervalArray(fitIntermediateNormal, ...
+    'extrFixedQSim', 'Extreme: simulated (PWM), fixed-q', ...
+    subsamplingFixedDenomSimColor, subsamplingFixedDenomSimLine); 
 
 %% Combine the methods into a single cell array
 
-methodsCI = {methodCentralBinomial};
+methodsCI = {methodCentralBinomial, methodCentralJW, methodExtremeSubsampFixedQ};
