@@ -43,7 +43,6 @@ methodCentralJW = ...
     'jw', 'Central: analytical correction', ...
     jwColor, jwLine); 
 
-
 %% Extreme: subsampling with denominator tuning parameter (q) fixed
 % Subsample sizes are chosen using the minimum volatility method
 
@@ -54,7 +53,6 @@ fitExtrFixedQ = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSamples) 
     extremeSubsamplingEstCI(thetaEsts, targetQuantiles, alphaCI, ...
     subsamplingQ, 'MV', numSubsamples);
  
-
 % Plotting parameters
 subsamplingFixedDenomColor = [222, 7, 7]/255;  
 subsamplingFixedDenomLine = '-o';
@@ -65,7 +63,6 @@ methodExtremeSubsampFixedQ = ...
     'extrFixedQ', 'Extreme: subsampling, fixed-q', ...
     subsamplingFixedDenomColor, subsamplingFixedDenomLine); 
 
-
 %% Extreme: subsampling with denominator parameter (q) matching numerator 
 % The parameter q in the denominator tracks the corresponding sample
 % quantile down to a minimum of q=1 (to prevent division by 0)
@@ -74,7 +71,6 @@ methodExtremeSubsampFixedQ = ...
 fitExtrSampleQ = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSamples) ...
     extremeSubsamplingEstCI(thetaEsts, targetQuantiles, alphaCI, ...
     'Sample', 'MV', numSubsamples);
- 
 
 % Plotting parameters
 subsamplingSampleDenomColor = [0.99, 0.03, 1]; 
@@ -86,7 +82,6 @@ methodExtremeSubsampSampleQ = ...
     'fitExtrSampleQ', 'Extreme: subsampling, q=l', ...
     subsamplingSampleDenomColor, subsamplingSampleDenomLine); 
 
-
 %% Extreme: simulated critical values with the PWM EV index estimator
 % This method uses the same denominatorParam as the subsampling method with
 % fixed-q
@@ -96,11 +91,9 @@ fitExtrFixedQSim = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSample
     extremeSimulationEstCI(thetaVector, targetQuantiles, alphaCI, ...
         subsamplingQ, numBootstrapSamples);
 
- 
-
 % Plotting parameters
 subsamplingFixedDenomSimColor = [60, 16, 97]/255;
-subsamplingFixedDenomSimLine = ''-pentagram';
+subsamplingFixedDenomSimLine = '-pentagram';
 
 % Instantiate
 methodExtremeSubsampFixedQ = ...
@@ -108,27 +101,22 @@ methodExtremeSubsampFixedQ = ...
     'extrFixedQSim', 'Extreme: simulated (PWM), fixed-q', ...
     subsamplingFixedDenomSimColor, subsamplingFixedDenomSimLine); 
 
-
-
 %% Intermediate: asymptotic normality
 
 % Fitting function
 fitIntermediateNormal = @(thetaEsts, targetQuantiles, varEsts, T,  numBootstrapSamples) ...
-    extremeSimulationEstCI(thetaVector, targetQuantiles, alphaCI, ...
-        subsamplingQ, numBootstrapSamples);
-
- 
+    intNormalEstCI(thetaEsts, targetQuantiles, alphaCI);
 
 % Plotting parameters
-subsamplingFixedDenomSimColor = [60, 16, 97]/255;
-subsamplingFixedDenomSimLine = ''-pentagram';
+intermediateNormalColor = [227, 207, 30]/255;
+intermediateNormalLine = '--^';
 
 % Instantiate
 methodIntermediateNormal = ...
     quantileEstimatorConfidenceIntervalArray(fitIntermediateNormal, ...
-    'extrFixedQSim', 'Extreme: simulated (PWM), fixed-q', ...
-    subsamplingFixedDenomSimColor, subsamplingFixedDenomSimLine); 
-
+    'intNormal', 'Intermediate: normal critical values', ...
+    intermediateNormalColor, intermediateNormalLine); 
+ 
 %% Combine the methods into a single cell array
 
 methodsCI = {methodCentralBinomial, methodCentralJW, methodExtremeSubsampFixedQ};
