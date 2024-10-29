@@ -10,7 +10,7 @@
 % ===========================================================
 
 function frechetQuantiles = frechetInverse(y, kappa)
-%FRECHETINVERSE Evaluate the  yth quantile function of Frechet distribution
+% frechetInverse Evaluate the  yth quantile of the Frechet distribution
 % 
 % Args:
 %   y: vector of quantiles to return

@@ -9,7 +9,7 @@
 % ===========================================================
 
 function Q = twoSidedPowerInverse(y, beta)
-%TWOSIDEDPOWERINVERSE Evaluate the yth quantile function of CDF with 
+% twoSidedPowerInverse Evaluate the yth quantile function of CDF with 
 % two infinite tails decay as 1-(x+1)^(-beta).
 %
 % Args:

@@ -26,6 +26,42 @@ thetaSamplerFrechet = dataSampler(frechetQuantiles, ...
     "kappa", "\kappa", frechetParam, ...
     1, false); % infinite right tail
 
+%% Theta: Student with four degrees of freedom (Müller, Wang 2017)
+
+studentQuantiles = @(u, nu) tinv(u, nu);
+studentParam = 3; % approximately three finite moments
+
+% Create instance
+thetaSamplerStudent = dataSampler(studentQuantiles, ...
+    "student", 'Student(3)', ...
+    "nu", "\nu", studentParam, ...
+    1, false); % infinite right tail
+
+%% Theta: standard exponential
+
+% Set quantile function and parameter value to use
+gumbelQuantiles = @(u, lambda) expinv(u, lambda); 
+gumbelParam = 1; 
+
+% Create instance
+thetaSamplerGumbel = dataSampler(gumbelQuantiles, ...
+    "gumbel", 'F_{Gu, \lambda}', ...
+    "lambda", "\lambda", gumbelParam, ...
+    0, false); % infinite right tail with gamma = 0
+
+%% Theta: Weibull-type
+ 
+% Set quantile function and parameter value to use
+weibullQuantiles = @(u, alpha)  ...
+    weibullInverse(u, 10, alpha);
+weibullParam = 4; 
+
+% Create instance
+thetaSamplerWeibull = dataSampler(weibullQuantiles, ...
+    "weibull", 'F_{W, \alpha}', ...
+    "alpha", "\alpha", weibullParam, ...
+    -1, true); % infinite right tail
+
 %% Shocks: two-sided Frechet (G_beta) distribution
 
 % Set quantile function and parameter value to use
@@ -36,7 +72,31 @@ gBetaParam = 8; % 8 finite moments for the noise
 uSamplerGBeta = dataSampler(gBetaInverse, ...
     "GBeta", 'G_{\kappa}', ...
     "beta", "\beta", gBetaParam, ...
-    1, false); % infinite right tail
+    1, false); % infinite right tail  
+
+%% Shocks: normal noise
+
+% Set quantile function and parameter value to use
+normInverse = @(u, sigma) norminv(u, 0, sigma);
+normParam = 1; % irrelevant, will be rescaled to match var of coefs
+
+% Create instance 
+uSamplerNormal = dataSampler(normInverse, ...
+    "normal", 'N(0, \sigma^2)', ...
+    "sigma", "\sigma", normParam, ...
+    0, false); % infinite right tail with gamma=0
+
+%% Shocks: noiseless setting
+
+% Set quantile function and parameter value to use
+noiselessInverse = @(u, zero) 0;
+noiselessParam = 0;  
+
+% Create instance 
+uSamplerNoiseless = dataSampler(noiselessInverse, ...
+    "noiseless", 'Noiseless', ...
+    "no", "", noiselessParam, ...
+    -1, false); % finite right tail  
 
 %% Collect distributions into cell arrays
 
@@ -45,73 +105,4 @@ thetaDistrsArray = findAndCollect('thetaSampler');
 
 % Collect all defined distributions for u
 uDistrsArray = findAndCollect('uSampler');
-
-%%  Distributions for thetas
-% All parameters have to be specified first
-
-% Marginals for theta
-thetaDistribution{1} = @(kappa, u) noisyExtreme_frechetInverse(u, kappa) ; % Frechet
-thetaDistribution{2} = @(lambda, u) expinv(u, lambda);  % Gumbel
-thetaDistribution{3} = @(alpha, u) noisyExtreme_weibullExampleInverse(u, 10, alpha);  % Gumbel   % Weibull
-
-% Parameter values used, must follow the same order as specified in the
-% distribution array
-thetaDistributionParam{1} = 4; % kappa, parameter for power law tail
-thetaDistributionParam{2} = 1; % lambda, parameter of exponential distr
-thetaDistributionParam{3} = 4; % alpha, parameter for finite tail
-   
-
-% Marginals for u_{it}
-uDistribution{1} = @(sigma, u) norminv(u, 0, sigma); % Normal
-uDistribution{2} = @(beta, u) noisyEndpoint_InfiniteEndpointPowerInverse(u, beta); % Normal
-uDistribution{3} = @(zero, u) 0; % Noiseless data
-
-uDistributionParam{1} = 1; % does not matter, variance is rescaled to match the coefficients in the simulation
-uDistributionParam{2} = 8;
-uDistributionParam{3} = 0; % Dummy parameter for convenience of coding
-
-% Save sign of gamma
-gammaSign{1} = 1;
-gammaSign{2}=0;
-gammaSign{3}=-1;
-
-
-%% Quantiles considered
-quantilesConsideredArray{1} = [0.9:0.005:0.99, 0.9905:0.0005:0.999]; % this kills the 0.85 quantile
-quantilesConsideredArray{2} = [0.9, 0.9:0.005:0.99, 0.9905:0.0005:0.999];
-quantilesConsideredArray{3} = [0.9, 0.9:0.005:0.99, 0.9905:0.0005:1]; % Finite endpoint
-
-
-% Names to construct the title
-thetaName{1} = 'F_{Fr, \kappa}';
-thetaName{2} = 'F_{Gu, \lambda}';
-thetaName{3} = 'F_{W, \alpha}';
-thetaParamName{1} = '\kappa';
-thetaParamName{2}= '\lambda';
-thetaParamName{3}= '\alpha';
-
-
-uName{1} = 'N(0, \sigma^2)';
-uName{2} = 'G_{\beta}';
-uName{3} = '0';
-
-uParamName{1} = '\sigma^2';
-uParamName{2} = '\beta';
-uParamName{3} = '';
-
-% Names to save
-thetaNameSave{1} = 'Fr';
-thetaNameSave{2} = 'Gu';
-thetaNameSave{3} = 'W';
-thetaParamNameSave{1} = 'kappa';
-thetaParamNameSave{2}= 'lambda';
-thetaParamNameSave{3}= 'alpha';
-uNameSave{1} = 'Normal';
-uNameSave{2} = 'Gbeta';
-uNameSave{3} = 'Noiseless';
-uParamNameSave{1} = 'sigmaSq';
-uParamNameSave{2} = 'beta';
-uParamNameSave{3} = '';
-
-
  
