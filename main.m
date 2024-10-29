@@ -35,12 +35,13 @@ clear variables
 close all
 
 % Load the required folders
-addpath('classes') 
-addpath('config') 
-addpath('confidenceIntervals')
-addpath('distributions')
-addpath('simulationScriptsFunctions') 
-addpath('utilities') % further useful scripts 
+addpath('classes') % implemented classes
+addpath('config') % setting simulation parameters
+addpath('confidenceIntervals') % implemented CI and estimator methods
+addpath('distributions') % Data generating processes
+addpath('simulationScriptsFunctions') % Scripts for running simulations
+addpath('plotting') % Scripts for generating figures
+addpath('utilities') % further useful scripts and functions
 
 %% Simulation configuration
  
@@ -49,8 +50,8 @@ rng(1,'multFibonacci')
  
 
 % Sample sizes
-Ns = 200;
-Ts = [10, 50];
+Ns = [200, 2000];
+Ts = [10, 20, 50];
 
 % Confidence interval parameter
 alphaCI = 0.05; 
@@ -60,7 +61,7 @@ targetQuantiles = [0.9:0.005:0.99, 0.9905:0.0005:1];
 
 % Exporting result
 plotQuietly = 0; % if 0, export figures without opening them 
-spacingExponent= 1.2; % what does this do?
+
 
 
 %% Specifying the data generating distributions
@@ -75,84 +76,32 @@ sigmaSqX = 1; % Variance of x
 rhoTheta = 0.5; % Correlation between individual coordinates of theta
 rhoXtheta = 0.5; % Correlation between x and theta
 
-% Load in the distributions for theta and u
-setDGP
-
-
-% 
-
-
-% T is set below when calling the simulation file
-Tmult = 1; % the exponent multiplying default T sizes
-
-
- 
-qSubsampling=2; % statistic for feasible EVT 
-qSimulation = 3;
-sC = 1; % tuning parameter for central variance estimations
-numSamples = 100; % number of replication samples
-numSubsamples = 1e4; % number of subsamples   
+numSamples = 5000; % number of replication samples
+numSubsamples = 5e3; % number of subsamples   
 numBootstrapSamples = 1e3        ; % number of bootstrap samples
 
 
-%  Load in the confidence intervals
+
+
+
  
+   
+
+%% Block 1: comparison of extreme, intermediate, central methods
+
+% Load in the distributions for theta and u
+setDGP
+
+% Load in methods
 setConfidenceIntervalMethods
-
-%% Simulate
-
+ 
+% Run the simulation
 simulateCoverages
 
+% Export plots
 
 
-%% OLD CALL 
-for j=3:3
-    for t=1:3
-        % 
-        thetaDistrChoice = j;
-        uDistrChoice = t;
-        if j==1
-            T= Tmult*10;
-        else
-            T = Tmult*15;
-        end
-        simulateCoverages
-    end
-end
+%% Block 2: impact of choice of the tuning parameter in the denominator
+ 
 
-
-%% Recompute intermediate intervals
-
-
-for j=1:3
-    for t=1:3
-        % 
-        thetaDistrChoice = j;
-        uDistrChoice = t;
-        if j==1
-            T= Tmult*10;
-        else
-            T = Tmult*15;
-        end
-        noisyExtreme_simulateIntermediate
-    end
-end
-
-
-%% Export plots
-
-for j=1:3
-    for t=1:3
-        thetaDistrChoice = j;
-        uDistrChoice = t;
-        if j==1
-            T= Tmult*10;
-        else
-            T = Tmult*15;
-        end
-        noisyExtreme_exportPlots
-    end
-end
-beep
-
-
+%% Block 3: quality of approximation in the feasible IVT 
