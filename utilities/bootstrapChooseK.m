@@ -1,5 +1,5 @@
 function kOpt = ...
-    bootstrapChooseK(thetaVector, kVector, numBootstrapSamples)
+    bootstrapChooseK(thetaVector, numBootstrapSamples)
     % bootstrapChooseK Chooses the optimal number k of intermediate order
     % statistics using semiparametric bootstrap and the PWM estimator.
     %
@@ -20,12 +20,18 @@ function kOpt = ...
     %        Selection in Extreme Value Analysis. In Extreme Value Modeling
     %        and Risk Analysis (pp. 69–85). Chapman and Hall/CRC.
     
+    % Extract sample size
+    N = length(thetaVector);
+
+    % TUNING PARAMETERS: The choice of k requires selecting a range of
+    % values to select from. We select 25 values between N^(1/4) and
+    % 4*N^(1/2) (which covers the heuristic choice of Drees and Kaufman).
+    % Set values for the k vector 
+    kVector = unique(floor(linspace(N^(1/4), 4 * N^(1/2), 25)));
+    
     % Compute PWM estimators for EV index and Pareto scale parameters
     [gammaEstCandidates, sigmaEstCandidates] = ...
         pwmEstimator(thetaVector, kVector);
-    
-    % Extract sample size
-    N = length(thetaVector);
     
     % Create a vector for bootstrap estimates of the MSE
     mseEsts = nan(length(kVector), 1);

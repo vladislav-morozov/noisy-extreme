@@ -76,13 +76,14 @@ classdef quantileEstimatorConfidenceIntervalArray
 
         % Method for fitting the CI
         function this = fit(...
-                this, dataVector, targetQuantiles)
+                this, dataVector, targetQuantiles, varEsts, T)
             % FIT Fits the corrected estimators and 
             % confidence intervals. Uses the fit function to compute both
             % based on data vector dataVector and chosen targetQuantiles
 
             [this.fittedQuantileEst, this.fittedCI] = ...
-                this.fittingFunction(dataVector, targetQuantiles);
+                this.fittingFunction(dataVector, targetQuantiles, ...
+                varEsts, T);
             this.targetQuantiles = targetQuantiles;
         end
 

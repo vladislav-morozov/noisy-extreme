@@ -23,10 +23,6 @@ function [simExtremeEst, simExtremeInt] = ...
     %     simExtremeEst (vector): Quantile estimators.
     %     simExtremeInt (matrix): Confidence intervals for quantiles.
     %
-    % TUNING PARAMETERS: The choice of k requires selecting a range of
-    % values to select from. We select 25 values between N^(1/4) and
-    % 4*N^(1/2) (which covers the heuristic choice of Drees and Kaufman).
-    %
     % References:
     %     1. Caers, J., Beirlant, J., & Maes, M. A. (1999). Statistics for
     %        Modeling Heavy Tailed Distributions in Geology: Part I.
@@ -35,15 +31,15 @@ function [simExtremeEst, simExtremeInt] = ...
     %        Selection in Extreme Value Analysis. In Extreme Value Modeling
     %        and Risk Analysis (pp. 69–85). Chapman and Hall/CRC.
 
-    % Set values for the k vector
+    % Extract sample size
     N = length(thetaVector);
-    kVector = unique(floor(linspace(N^(1/4), 4 * N^(1/2), 25)));
     
     % Choose optimal k using semiparametric bootstrap
-    kOpt = bootstrapChooseK(thetaVector, kVector, numBootstrapSamples);
+    kOpt = bootstrapChooseK(thetaVector, numBootstrapSamples);
     
     % Compute estimator for gamma
     gammaEst = pwmEstimator(thetaVector, kOpt);
+
     
     % Compute critical values by simulations
     critValues = ...
@@ -113,7 +109,7 @@ function limitRatioQuantiles = ...
     if isnumeric(denominatorParam)
         % Use the presupplied q
         denominatorSum = ...
-            sum(expSample(:, 1:min(2, denominatorParam + 1)), 2);
+            sum(expSample(:, 1:denominatorParam), 2);
     else
         % Set q to match the corresponding sample quantile
         denominatorSum = gammaSumL;

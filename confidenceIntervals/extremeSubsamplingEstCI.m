@@ -30,7 +30,7 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
     % selecting a range of candidate values and the size of the moving 
     % window. The results are not sensitive to these choices. The following 
     % values are used by default, but they can be replaced with arguments.
-    candidateSizes = floor((0.5:0.05:2) * (N^(4/5)));
+    candidateSizes = floor(linspace( 0.5*N^(4/5), 2*N^(4/5), 20));
     mvMovingAverageSize = 7;
     
     % Check which version of subsampling to apply
@@ -176,10 +176,11 @@ function subsampledValuesW = ...
     % Allocate space for values of subsampled statistic W
     subsampledValuesW = zeros(numSubsamples, numTargetQuantiles);  
 
+    indices = randi(N, subsampleSize, numSubsamples);
     % Draw subsamples
     for subsampleID = 1:numSubsamples
         % Draw subsample, sort it, extract
-        currentSubsample = randsample(thetas, subsampleSize);
+        currentSubsample = thetas(indices(:, subsampleID));
         sampleSorted = sort(currentSubsample);
         % Check how to handle the denominator
         if isnumeric(denominatorParam)

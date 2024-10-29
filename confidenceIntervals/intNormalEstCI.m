@@ -27,7 +27,7 @@ function [intNormalEst, intNormalCI] = ...
     thetaDenominator = thetaVector(N - kIVT - sIVT);
 
     % Set the estimators
-    intNormalEst = thetaNumerator;
+    intNormalEst = thetaNumerator';
 
     % Set the confidence intervals
     intNormalCI = [ ...
