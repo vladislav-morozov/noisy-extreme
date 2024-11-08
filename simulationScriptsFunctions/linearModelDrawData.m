@@ -5,11 +5,13 @@
 % Project Name: Inference on Extreme Quantiles of Unobserved 
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
+%
 % ===========================================================
+
 function [y, x, trueTheta, u] = ...
     linearModelDrawData(N, T, constantIncluded, ...
     numCov, thetaSampler, uSampler, sigmaSqX, rhoTheta, rhoXtheta)
-% LINEARMODELDRAWDATA Draws data from a linear model y = theta' * x.
+% linearModelDrawData Draws data from a linear model y = theta' * x.
 %
 % Data format -- TxN, rows index time, N indexes units.
 %
@@ -31,7 +33,8 @@ function [y, x, trueTheta, u] = ...
 %     u (matrix): Sampled noise.
 
     % Uniform sampler offset by 0.1 to ensure existence of moments
-    xSampler = @(u) 0.1 + u;
+    % Note: default variance of x is 1
+    xSampler = @(u) 0.1+ u*sqrt(12);
 
     % Covariance matrix of coefficients
     Rho = eye(numCov) + rhoTheta * (ones(numCov) - eye(numCov));
@@ -46,8 +49,9 @@ function [y, x, trueTheta, u] = ...
     % Draw x for each time period and unit
     for t = 1:T
         for i = 1:N
-            x(t, i, :) = rhoXtheta * trueTheta(i, :) + 10 *...
-                sqrt(sigmaSqX * (1 + rhoXtheta * norm(trueTheta(i, :)))) * ...
+            x(t, i, :) = rhoXtheta * trueTheta(i, :) +  ...
+                sqrt(...
+                sigmaSqX * (1 + rhoXtheta * norm(trueTheta(i, :)))) * ...
                 xSampler(rand(1, numCov));
         end
     end

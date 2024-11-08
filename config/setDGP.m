@@ -12,6 +12,7 @@
 % Project Name: Inference on Extreme Quantiles of Unobserved 
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
+%
 % ===========================================================
 
 %% Theta: Frechet distribution
