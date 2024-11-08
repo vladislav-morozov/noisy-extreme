@@ -1,128 +1,145 @@
 % ===========================================================
 % File: simulateCoveragesErrors.m
-% Description: This file contains the main simulation loop of the
-% simulations. It runs the simulation for all combinations of data
-% generating processes and sample sizes. The results are saved in .mat
-% files specific to given DGP and (N, T)
+% Description: This script runs the main simulation loop, iterating 
+%              through all combinations of data-generating processes (DGPs) 
+%              and sample sizes. Simulation results are saved in .mat files 
+%              specific to each DGP and (N, T) combination.
 %
 % Project Name: Inference on Extreme Quantiles of Unobserved
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
 % ===========================================================
 
-%% Zip together the defining parameters of the simulation
+%% Define Simulation Parameters
 
-% Create combinations of DGPs
+% Generate combinations of DGPs by pairing distributions for coefficients 
+% and shocks with sample sizes (N, T).
 dgps = combinations(thetaDistrsArray, uDistrsArray, Ns, Ts);
 
-% Number of methods to evaluate
+% Define the number of confidence interval (CI) estimation methods
 numMethods = length(methodsCI);
 
-%% Main simulation
-% Loop through DGP
+%% Set Up Parallel Processing
 
-for dgpID = 1 : height(dgps)
+% Create or retrieve a parallel pool if it doesn’t exist
+p = gcp('nocreate'); % Check for existing parallel pool
+if isempty(p)
+    parpool('LocalProfile1', 16); % Adjust profile and worker count 
+end
 
-    % Set sample sizes
+%% Main Simulation Loop
+
+% Loop over each DGP combination
+for dgpID = 1:height(dgps)
+
+    % Extract sample sizes (N, T) for the current DGP
     N = dgps{dgpID, 3};
     T = dgps{dgpID, 4};
 
-    % Extract data generating processes for coefficients and shocks
-    thetaSampler = dgps{dgpID, 1}{1};
-    uSampler = dgps{dgpID, 2}{1};
+    % Extract DGPs for coefficients and shocks
+    loopThetaSampler = dgps{dgpID, 1}{1};
+    loopUSampler = dgps{dgpID, 2}{1};
 
-    % Adjust the variance of the DGP for the shocks
-    uSampler = uSampler.calibrateVariance(thetaSampler);
+    % Calibrate variance of the shock DGP to match coefficient DGP
+    loopUSampler = loopUSampler.calibrateVariance(loopThetaSampler);
 
-    % Create a vector of appropriate target quantiles for current DGP
-    % Do not target the endpoints for distributions with infinite endpoints
-    if ~thetaSampler.finiteRightEndpoint
-        targetQuantilesDGP = targetQuantiles(targetQuantiles<1);
+    % Define target quantiles based on coefficient DGP properties
+    if ~loopThetaSampler.finiteRightEndpoint
+        targetQuantilesDGP = targetQuantiles(targetQuantiles < 1);
     else
         targetQuantilesDGP = targetQuantiles;
     end
 
-    % Compute the true quantiles
+    % Compute true quantile values for the current DGP
     trueQuantileVals = ...
-        thetaSampler.distrInverse(targetQuantilesDGP, ...
-        thetaSampler.paramValue);
+        loopThetaSampler.distrInverse(targetQuantilesDGP, ...
+                                      loopThetaSampler.paramValue);
 
-    % Create temporary arrays, these will be inserted into results arrays
-    ciCoversTemp = NaN(numSamples, length(targetQuantilesDGP), numMethods);
-    ciLengthsTemp = NaN(numSamples, length(targetQuantilesDGP), numMethods);
-    estErrorsTemp = NaN(numSamples, length(targetQuantilesDGP), numMethods);
+    % Initialize temporary result arrays for CI coverage, lengths, and
+    % estimation errors
+    ciCoversTemp = ...
+        NaN(numSamples, length(targetQuantilesDGP), numMethods);
+    ciLengthsTemp = ...
+        NaN(numSamples, length(targetQuantilesDGP), numMethods);
+    estErrorsTemp = ...
+        NaN(numSamples, length(targetQuantilesDGP), numMethods);
 
-
-
-    % Create result arrays for
+    % Create a structured array to store simulation results
     resultsArray = ...
         createSimResultArrays(methodsCI, trueQuantileVals, numSamples);
 
-    % Draw Monte Carlo samples: simulation computations go here
-
-    % Create bar to visualize progress
+    % Set up a progress bar for monitoring simulation progress
     progressQueue = createParallelProgressBar(numSamples);
 
-    % Print a description of current simulation to the console
-    fprintf(strjoin(["\n Currently working on:", ...
-        "\n theta: ", thetaSampler.distrMachineName, ...
-        "\n u: ", uSampler.distrMachineName, ...
-        "\n N = ", num2str(N), ", T = ", num2str(T), "\n"], ''))
-    % Loop
-    parfor sampleID = 1:numSamples %
-        % Draw data
-        [y, x, coefsTrue, ~] = ...
-            linearModelDrawData(N, T, constantIncluded, numCov, ...
-            thetaSampler, uSampler, sigmaSqX, rhoTheta, rhoXtheta);
+    % Display information about the current simulation setup in the console
+    fprintf('\n Currently working on:\n');
+    fprintf(' - theta: %s\n - u: %s\n - N = %d, T = %d\n', ...
+        loopThetaSampler.distrMachineName, ...
+        loopUSampler.distrMachineName, N, T);
 
-        % Parameter of interest: second coordinate
-        thetaTrue = coefsTrue(:, 2); % second coordinate
-        thetaTrueSorted =sort(thetaTrue);
+    %% Monte Carlo Simulation Loop
+    parfor sampleID = 1:numSamples
+        
+        % Step 1: Draw data for the current sample
+        [y, x, coefsTrue, ~] = ....
+            linearModelDrawData(N, T, constantIncluded, ...
+                                numCov, loopThetaSampler, ...
+                                loopUSampler, sigmaSqX, ...
+                                rhoTheta, rhoXtheta);
 
-        % Compute estimators and standard errors
+        % Extract the true value of the second coefficient (parameter of
+        % interest)
+        thetaTrue = coefsTrue(:, 2);
+        thetaTrueSorted = sort(thetaTrue);
+
+        % Step 2: Estimate coefficients and their variances
         [coefsEsts, varEsts] = OLS(y, x);
         thetaEsts = coefsEsts(:, 2);
-        varEsts = T*squeeze(varEsts(2, 2, :));
+        varEsts = T * squeeze(varEsts(2, 2, :));
 
-        % Sort estimates
+        % Sort the estimated parameters for further processing
         thetaEstsSorted = sort(thetaEsts);
 
-        % Loop through the methods
+        % Step 3: Evaluate each CI method
         for methodID = 1:numMethods
-            % Fit the current method
+            
+            % Fit the current CI method to the sorted estimates
             currentApproach = ...
                 methodsCI{methodID}.fit(thetaEstsSorted, ...
-                targetQuantilesDGP, varEsts, T);
+                                        targetQuantilesDGP, varEsts, T);
 
-            % Save results to temporary arrays
+            % Store results for CI coverage, length, and estimation errors
             ciCoversTemp(sampleID, :, methodID) = ...
                 currentApproach.computeCoverage(trueQuantileVals);
             ciLengthsTemp(sampleID, :, methodID) = ...
                 currentApproach.computeLengths();
-            estErrorsTemp(sampleID, :, methodID) = ...
+            estErrorsTemp(sampleID, :, methodID) = ....
                 currentApproach.computeEstErrors(trueQuantileVals);
-
         end
-        % Send a message to update the progress bar
-        send(progressQueue, sampleID);
 
+        % Update the progress bar
+        send(progressQueue, sampleID);
     end
 
-    % Update arrays
-    resultsArray = ...
-        updateSimResultArrays(resultsArray, ...
-        ciCoversTemp, ciLengthsTemp, estErrorsTemp);
+    %% Update Result Arrays and Save Output
 
-    % Save results for DGP and sample size combination
-    fileName = strjoin(['outputs/samples_',num2str(numSamples),...
-        '_N_', num2str(N), '_T_', num2str(T), ...
-        '_F_', thetaSampler.distrMachineName,...
-        '_', thetaSampler.paramMachineName, '_',...
-        num2str(thetaSampler.paramValue),...
-        '_G_', uSampler.distrMachineName,...
-        '_', uSampler.paramMachineName, '_',...
-        num2str(uSampler.paramValue),...
-        '.mat' ], '');
-    save(fileName)
+    % Transfer temporary results into the main results array
+    resultsArray = updateSimResultArrays(resultsArray, ciCoversTemp, ...
+                                         ciLengthsTemp, estErrorsTemp);
 
+    % Clear the progress queue before saving
+    clear progressQueue;
+
+    % Construct filename for saving results
+    fileName = ...
+        sprintf('outputs/samples_%d_N_%d_T_%d_F_%s_%s_%.0f_G_%s_%s_%.0f.mat', ...
+                 numSamples, N, T, loopThetaSampler.distrMachineName, ...
+                 loopThetaSampler.paramMachineName, ...
+                 loopThetaSampler.paramValue, ...
+                 loopUSampler.distrMachineName, ...
+                 loopUSampler.paramMachineName, ...
+                 loopUSampler.paramValue);
+    
+    % Save results to a .mat file
+    save(fileName, 'resultsArray');
 end
