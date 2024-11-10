@@ -1,6 +1,6 @@
 function queue = createParallelProgressBar(totalIterations)
     % createParallelProgressBar Initializes a progress bar for parallel
-    % computations. The bar is closed after execution completes. 
+    % computations with dynamic color changing from dark orange to blue.
     %
     % Args:
     %     totalIterations (int): Total number of iterations for the
@@ -10,11 +10,8 @@ function queue = createParallelProgressBar(totalIterations)
     %     queue (parallel.pool.DataQueue): DataQueue to receive progress
     %                                      updates.
     %
-    % Usage:
-    %   1. Insert
-    %
     % Example usage in a parallel loop:
-    %     nunSamples = 100;
+    %     numSamples = 100;
     %     queue = createParallelProgressBar(numSamples);
     %     parfor i = 1:numSamples
     %         % Simulate computation
@@ -26,18 +23,44 @@ function queue = createParallelProgressBar(totalIterations)
     % Initialize DataQueue and Progress Bar
     queue = parallel.pool.DataQueue;
     progressBar = waitbar(0, 'Processing...', 'Name', 'Computation Progress');
- 
+    
+    % Access the Java-based components of the waitbar
+    wbc = allchild(progressBar);
+    javaProgressBar = wbc(1).JavaPeer;  % Access the Java progress bar
+
+    % Enable string painting to show percentage inside the bar
+    javaProgressBar.setStringPainted(true);
+
     % Reset persistent variable count
     persistent count
     count = 0;
 
-    % Nested function to update progress
-    function updateProgress(~)
+    % Define colors between which the bar interpolates
+    colorEnd = [12, 123, 220] / 255; % light blue
+    colorStart = [171, 94, 0] / 255; % brown-orange
 
+    % Nested function to update progress and color
+    function updateProgress(~)
         count = count + 1;
-        waitbar(count / totalIterations, progressBar, ...
-            sprintf('Processing... %.1f%%', ...
-            100 * count / totalIterations));
+        shareComplete = count / totalIterations;
+        
+        % Update waitbar position without extra text
+        waitbar(shareComplete, progressBar);
+
+        % Calculate color transition
+        currentColor = (1 - shareComplete) * colorStart + ...
+                        shareComplete * colorEnd;
+        red = currentColor(1);
+        green = currentColor(2);
+        blue = currentColor(3);
+
+        % Convert RGB triplet to Java Color
+        javaColor = java.awt.Color(red, green, blue);
+
+        % Set the progress bar color
+        javaProgressBar.setForeground(javaColor);
+        
+        % Close progress bar when complete
         if count == totalIterations
             close(progressBar);
             count = [];
@@ -46,6 +69,4 @@ function queue = createParallelProgressBar(totalIterations)
 
     % Add listener to the DataQueue
     afterEach(queue, @updateProgress);
-
-    
 end
