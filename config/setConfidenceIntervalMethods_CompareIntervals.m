@@ -1,13 +1,15 @@
 % ===========================================================
-% File: setConfidenceIntervalMethods.m
+% File: setConfidenceIntervalMethods_CompareIntervals.m
 % Description: This script describes the confidence intervals to be
-% evaluated. Each confidence interval must be an instance of the
+% evaluated in the main simulation.
+% Each confidence interval must be an instance of the
 % quantileEstimatorConfidenceIntervalArray class. 
 % Note: quantileEstimatorConfidenceIntervalArray is a value class.
 %
 % Project Name: Inference on Extreme Quantiles of Unobserved 
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
+%
 % ===========================================================
 
 %% Central: Binomial CI with no correction 
@@ -48,7 +50,7 @@ methodArrayCentralJW = ...
 % Subsample sizes are chosen using the minimum volatility method
 
 % Choose reference value for denominator parameter
-subsamplingQ = 5;
+subsamplingQ = 2;
 % Fitting function
 fitExtrFixedQ = @(thetaEsts, targetQuantiles, varEsts, T) ...
     extremeSubsamplingEstCI(thetaEsts, targetQuantiles, alphaCI, ...
@@ -87,13 +89,14 @@ methodArrayExtremeSubsampFixedQ = ...
 %     subsamplingSampleDenomColor, subsamplingSampleDenomLine); 
 
 %% Extreme: simulated critical values with the PWM EV index estimator
-% This method uses the same denominatorParam as the subsampling method with
-% fixed-q
+
+% Choose reference value for denominator parameter
+simulatedQ = 4;
 
 % Fitting function
 fitExtrFixedQSim = @(thetaEsts, targetQuantiles, varEsts, T) ...
     extremeSimulationEstCI(thetaEsts, targetQuantiles, alphaCI, ...
-        subsamplingQ, numBootstrapSamples);
+        simulatedQ, numBootstrapSamples);
 
 % Plotting parameters
 subsamplingFixedDenomSimColor = [60, 16, 97]/255;
