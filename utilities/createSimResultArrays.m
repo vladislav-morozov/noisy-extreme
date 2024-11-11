@@ -1,6 +1,6 @@
 function simResultArrayInstances = ...
     createSimResultArrays(ciMethodsArray, trueQuantileValues, numSamples)
-% CREATESIMRESULTARRAYS Creates and initializes simResultArray instances.
+% createSimResultArrays Creates and initializes simResultArray instances.
 %
 % Args:
 %     ciMethodsArray (cell): cell array with methods array, each one will

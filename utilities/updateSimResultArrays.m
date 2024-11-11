@@ -1,6 +1,6 @@
 function resultsArray = updateSimResultArrays(resultsArray, ...
     ciCoversTemp, ciLengthsTemp, estErrorsTemp)
-% UPDATESIMRESULTARRAYS Updates the results array.
+% updateSimResultArrays Updates the results array.
 % Inserts the corresponding simulation results into each component 
 % of the resultsArray.
 %

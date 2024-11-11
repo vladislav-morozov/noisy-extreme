@@ -1,5 +1,5 @@
 function matchedVars = findAndCollect(pattern)
-% FINDANDCOLLECT Finds variables matching the given pattern and stores them
+% findAndCollect Finds variables matching the given pattern and stores them
 % in a cell array.
 %
 % Args:
