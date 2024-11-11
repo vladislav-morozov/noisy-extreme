@@ -31,7 +31,7 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
     % window. The results are not sensitive to these choices. The following 
     % values are used by default, but they can be replaced with arguments.
     candidateSizes = floor(linspace( 0.5*N^(4/5), 2*N^(4/5), 20));
-    mvMovingAverageSize = 7;
+    mvMovingAverageSize = 5;
     
     % Check which version of subsampling to apply
     if isnumeric(subsampleSize)
