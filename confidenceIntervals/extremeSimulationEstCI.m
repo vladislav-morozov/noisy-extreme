@@ -94,7 +94,8 @@ function limitRatioQuantiles = ...
     l = reshape(l, [1, length(l)]);
     
     % Draw enough IID standard exponential variables
-    expSample = exprnd(1, [sampleSize, max(floor(l)) + 1]);
+    expSample = exprnd(1, ...
+        [sampleSize, max(max(floor(l)) + 1, denominatorParam)]);
     gammas1 = expSample(:, 1); % Extract the Gamma_1 term
     
     % Create sums of exponentials. Columns index quantiles of interest.
