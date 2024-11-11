@@ -27,7 +27,9 @@ classdef quantileEstimatorConfidenceIntervalArray
         legendName;              % Mame using for plotting
                                  % e.g., "Extreme approx. (w/ subsampling)"
         plottingColor;           % RGB triplet for line color
-        plottingLineStyle;       % Line type and markers for plotting
+        plottingLineStyle;       % Line type for plotting
+        plottingMarker;         % Marker size for plotting
+        plottingMarkerSize;      % Size of markers for plotting
         targetQuantiles;         % Row vector of target quantiles, 
                                  % Created during fitting
         fittedQuantileEst;       % |targetQuantiles|-vector (row) of 
@@ -46,7 +48,8 @@ classdef quantileEstimatorConfidenceIntervalArray
         function ciArray = ...
                 quantileEstimatorConfidenceIntervalArray(...
                 fit, machineReadableName, legendName, ...
-                plottingColor, plottingLineStyle ...
+                plottingColor, plottingLineStyle, ...
+                plottingMarker, plottingMarkerSize ...
                 )
             %quantileEstimatorConfidenceIntervalArray    
             %  Initializes target quantiles, default estimators and CIs,
@@ -72,6 +75,8 @@ classdef quantileEstimatorConfidenceIntervalArray
             % Set plotting parameters
             ciArray.plottingColor = plottingColor;
             ciArray.plottingLineStyle = plottingLineStyle;
+            ciArray.plottingMarker = plottingMarker;
+            ciArray.plottingMarkerSize = plottingMarkerSize;
         end
 
         % Method for fitting the CI

@@ -19,14 +19,17 @@ fitBinomial = @(thetaEsts, targetQuantiles, varEsts, T) ...
     quantileBinomialEstCI(thetaEsts, targetQuantiles, alphaCI, 1);
 
 % Plotting parameters
-binomialColor = [46, 230, 46]/255;
-binomialLine = '-.+';
+binomialColor = [200, 200, 200]/255;
+binomialLine = '-.';
+binomialMarker = 'none';
+binomialMarkerSize = 4;
 
 % Instantiate
 methodArrayCentralBinomial = ...
     quantileEstimatorConfidenceIntervalArray(fitBinomial, ...
     'binomial', 'Central (naive)', ...
-    binomialColor, binomialLine); 
+    binomialColor, binomialLine, ...
+    binomialMarker, binomialMarkerSize); 
 
 %% Central: normal approximation with debiasing (JW 2024)
 % Args: data, targetQuantiles, variances, T, bootstrap samples, alpha
@@ -37,14 +40,17 @@ fitJW = @(thetaEsts, targetQuantiles, varEsts, T) ...
     varEsts, T,  numBootstrapSamples);
 
 % Plotting parameters
-jwColor = [ 106, 130, 68]/255;
-jwLine = '-..';
+jwColor = [140, 140, 140]/255;
+jwLine = '-.';
+jwMarker = '|';
+jwMarkerSize = 4;
 
 % Instantiate
 methodArrayCentralJW = ...
     quantileEstimatorConfidenceIntervalArray(fitJW, ...
     'jw', 'Central: analytical correction', ...
-    jwColor, jwLine); 
+    jwColor, jwLine, ...
+    jwMarker, jwMarkerSize); 
 
 %% Extreme: subsampling with denominator tuning parameter (q) fixed
 % Subsample sizes are chosen using the minimum volatility method
@@ -57,14 +63,17 @@ fitExtrFixedQ = @(thetaEsts, targetQuantiles, varEsts, T) ...
     subsamplingQ, 'MV', numSubsamples);
  
 % Plotting parameters
-subsamplingFixedDenomColor = [222, 7, 7]/255;  
-subsamplingFixedDenomLine = '-o';
+subsamplingFixedDenomColor = [0, 0, 255]/255;  
+subsamplingFixedDenomLine = '-';
+subsamplingFixedDenomMarker = 'x';
+subsamplingFixedDenomMarkerSize = 4;
 
 % Instantiate
 methodArrayExtremeSubsampFixedQ = ...
     quantileEstimatorConfidenceIntervalArray(fitExtrFixedQ, ...
     'extrFixedQ', 'Extreme: subsampling, fixed-q', ...
-    subsamplingFixedDenomColor, subsamplingFixedDenomLine); 
+    subsamplingFixedDenomColor, subsamplingFixedDenomLine, ...
+    subsamplingFixedDenomMarker, subsamplingFixedDenomMarkerSize); 
 
 %% Extreme: subsampling with denominator parameter (q) matching numerator 
 % The parameter q in the denominator tracks the corresponding sample
@@ -99,14 +108,17 @@ fitExtrFixedQSim = @(thetaEsts, targetQuantiles, varEsts, T) ...
         simulatedQ, numBootstrapSamples);
 
 % Plotting parameters
-subsamplingFixedDenomSimColor = [60, 16, 97]/255;
-subsamplingFixedDenomSimLine = '-pentagram';
+subsamplingFixedDenomSimColor = [1, 135, 232]/255; 
+subsamplingFixedDenomSimLine = '-';
+subsamplingFixedDenomSimMarker = 'o';
+subsamplingFixedDenomSimMarkerSize = 4;
 
 % Instantiate
 methodArrayExtremeSimFixedQ = ...
     quantileEstimatorConfidenceIntervalArray(fitExtrFixedQSim, ...
     'extrFixedQSim', 'Extreme: simulated (PWM), fixed-q', ...
-    subsamplingFixedDenomSimColor, subsamplingFixedDenomSimLine); 
+    subsamplingFixedDenomSimColor, subsamplingFixedDenomSimLine, ...
+    subsamplingFixedDenomSimMarker, subsamplingFixedDenomSimMarkerSize); 
 
 %% Intermediate: asymptotic normality
 
@@ -115,14 +127,17 @@ fitIntermediateNormal = @(thetaEsts, targetQuantiles, varEsts, T) ...
     intNormalEstCI(thetaEsts, targetQuantiles, alphaCI);
 
 % Plotting parameters
-intermediateNormalColor = [227, 207, 30]/255;
-intermediateNormalLine = '--^';
+intermediateNormalColor = [168, 100, 0]/255;  
+intermediateNormalLine = '--';
+intermediateNormalMarker = '^';
+intermediateNormalMarkerSize = 3;
 
 % Instantiate
 methodArrayIntermediateNormal = ...
     quantileEstimatorConfidenceIntervalArray(fitIntermediateNormal, ...
     'intNormal', 'Intermediate: normal critical values', ...
-    intermediateNormalColor, intermediateNormalLine); 
+    intermediateNormalColor, intermediateNormalLine, ...
+    intermediateNormalMarker, intermediateNormalMarkerSize); 
 
 %% Intermediate: extrapolation-based
 
@@ -131,15 +146,18 @@ fitIntermediateExtrapolation = @(thetaEsts, targetQuantiles, varEsts, T) ...
     extrapolationEstCI(thetaEsts, targetQuantiles, alphaCI);
 
 % Plotting parameters
-intermediateExtrColor = [255, 165,0]/255;
-intermediateExtrLine = '--<';
+intermediateExtrColor = [214, 190, 0]/255;  %  yellowish
+intermediateExtrLine = '--';
+intermediateExtrMarker = 'v';
+intermediateExtrMarkerSize = 3;
 
 % Instantiate
 methodArrayIntermediateExtr = ...
     quantileEstimatorConfidenceIntervalArray(...
     fitIntermediateExtrapolation, ...
     'intExtr', 'Intermediate: extrapolation', ...
-    intermediateExtrColor, intermediateExtrLine); 
+    intermediateExtrColor, intermediateExtrLine, ...
+    intermediateExtrMarker, intermediateExtrMarkerSize); 
 
  
 %% Combine the methods into a single cell array
