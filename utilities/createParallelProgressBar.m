@@ -12,6 +12,7 @@ function queue = createParallelProgressBar(totalIterations)
     %
     % Example usage in a parallel loop:
     %     numSamples = 100;
+    %     % Create progress bar
     %     queue = createParallelProgressBar(numSamples);
     %     parfor i = 1:numSamples
     %         % Simulate computation
@@ -25,8 +26,8 @@ function queue = createParallelProgressBar(totalIterations)
     progressBar = waitbar(0, 'Processing...', 'Name', 'Computation Progress');
     
     % Access the Java-based components of the waitbar
-    wbc = allchild(progressBar);
-    javaProgressBar = wbc(1).JavaPeer;  % Access the Java progress bar
+    barChildren = allchild(progressBar);
+    javaProgressBar = barChildren(1).JavaPeer;  % Access the Java progress bar
 
     % Enable string painting to show percentage inside the bar
     javaProgressBar.setStringPainted(true);
@@ -44,7 +45,7 @@ function queue = createParallelProgressBar(totalIterations)
         count = count + 1;
         shareComplete = count / totalIterations;
         
-        % Update waitbar position without extra text
+        % Update waitbar position
         waitbar(shareComplete, progressBar);
 
         % Calculate color transition
