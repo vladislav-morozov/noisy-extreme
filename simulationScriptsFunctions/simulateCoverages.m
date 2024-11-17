@@ -30,7 +30,7 @@ end
 %% Main Simulation Loop
 
 % Loop over each DGP combination
-for dgpID = 1:height(dgps)
+for dgpID = 1:height(dgps)  
 
     % Extract sample sizes (N, T) for the current DGP
     N = dgps{dgpID, 3};
@@ -127,19 +127,14 @@ for dgpID = 1:height(dgps)
     resultsArray = updateSimResultArrays(resultsArray, ciCoversTemp, ...
                                          ciLengthsTemp, estErrorsTemp);
 
-    % Clear the progress queue before saving
+    % Delete the progress queue to avoid saving it
     clear progressQueue;
 
     % Construct filename for saving results
-    fileName = ...
-        sprintf('outputs/samples_%d_N_%d_T_%d_F_%s_%s_%.0f_G_%s_%s_%.0f.mat', ...
-                 numSamples, N, T, loopThetaSampler.distrMachineName, ...
-                 loopThetaSampler.paramMachineName, ...
-                 loopThetaSampler.paramValue, ...
-                 loopUSampler.distrMachineName, ...
-                 loopUSampler.paramMachineName, ...
-                 loopUSampler.paramValue);
+    fileName = makeOutputFileName(loopThetaSampler, loopUSampler, ...
+                                  N, T, ...
+                                  numSamples, simContext);
     
     % Save results to a .mat file
-    save(fileName, 'resultsArray');
+    save(fileName);
 end
