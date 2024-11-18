@@ -2,67 +2,130 @@
 
 setPlottingParameters
 
+% Set color plot. Options are 'color' and 'BW'
+colorMode = 'color'; 
+
 %% Plot descriptions
-% Implementation note: since different plots are required, plot type is
-% supplied as a string, and called with eval
 
-% Plot 1: coverages 
+% Implementation notes: 
+% 1. Since different plots are required, plot type is supplied as a string,
+%    and called with eval.
+% 2. Plots are drawn in three steps: first the full line. Then a possibly
+%    sparse collection of markers. Finally, a dummy plot with both the line
+%    and the markers. The dummy plot is the one used to draw the legend.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Plot 1: coverages %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Limits for y axis
 linePlots{1}.yLim = [0, 1];
-
+% Label for y axis
+linePlots{1}.yLabel = 'Coverage';
+% Method for processing data to plot
 linePlots{1}.computeData = ...
-    @(resultsArray, methodID) smoothdata(mean(resultsArray{methodID}.ciCovers), "gaussian", 10);
-
+    @(resultsArray, methodID) ...
+        smoothdata(...
+        computeCoverageLengthNonNaN(resultsArray, methodID, 'coverage'), ...
+        "gaussian", 10);
+% Line plot call
 linePlots{1}.plotCallLine = ['linePlot = plot(spacing, currentData', ...
     ', methodsCI{methodID}.plottingLineStyle', ...
     ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.plottingColor', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
     ', "DisplayName", methodsCI{methodID}.legendName);'];
-
+% Marker plot call
 linePlots{1}.plotCallMarker = ['markerPlot = plot(spacingMarker, currentDataMarker', ...
     ', "LineStyle", "none"' ...
     ', "Marker", methodsCI{methodID}.plottingMarker', ...
     ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
     ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.plottingColor', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
     ', "DisplayName", methodsCI{methodID}.legendName);'];
-
+% Legend plot call
 linePlots{1}.plotCallLegend = ['legendPlot = plot(-0.001, 0', ...
     ', methodsCI{methodID}.plottingLineStyle', ...
     ', "Marker", methodsCI{methodID}.plottingMarker', ...
     ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
     ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.plottingColor', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
     ', "DisplayName", methodsCI{methodID}.legendName);'];
-
+% Type of the plot, used to to generate file name
 linePlots{1}.plotType = 'coverage';
-linePlots{1}.firstMethodID = 1; % first method to plot
-linePlots{1}.yLabel = 'Coverage';
+% ID of first method to plotted
+linePlots{1}.firstMethodID = 1;
+% Whether to add a horizontal line and at which level
 linePlots{1}.yLine = 1-alphaCI;
+% Whether to add legend
+linePlots{1}.plotLegend = false;
+% Legend position
 linePlots{1}.legendPosition = [0.844, 0.085, 0.1, 0.07];
+% Exponent for nonlinearly transforming Y axis
 linePlots{1}.spacingExponentY = 2.7;
+% Whether special ticks for the Y axis should be used and which
 linePlots{1}.yTicks = [0, 0.4:0.1:0.9, 1-alphaCI, 1];
+% Suptitle for the overall plot
+linePlots{1}.suptitle = '\textbf{Coverage}';
 
-% Plot 2: lenghts
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%%% Plot 2: lengths %%%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+% Limits for y axis
 linePlots{2}.yLim = [];
-
-linePlots{2}.computeData = ...
-    @(resultsArray, methodID) mean(resultsArray{methodID}.ciLength);
-
-linePlots{2}.plotCall = ['semilogy(spacing, smooth(currentData)', ...
-                         ', methodsCI{methodID}.plottingLineStyle', ...
-                         ', "LineWidth", plotLineThickness', ...
-                         ', "Color", methodsCI{methodID}.plottingColor', ...
-                         ', "DisplayName", methodsCI{methodID}.legendName)'];
-linePlots{2}.plotType = 'coverage';
-linePlots{2}.firstMethodID = 1;  
+% Label for y axis
 linePlots{2}.yLabel = 'Interval Length';
+% Method for processing data to plot
+linePlots{2}.computeData = ...
+    @(resultsArray, methodID) ...
+        smoothdata(...
+        computeCoverageLengthNonNaN(resultsArray, methodID, 'length'), ...
+        "gaussian", 10);
+% Line plot call
+linePlots{2}.plotCallLine = ['linePlot = semilogy(spacing, currentData', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Marker plot call
+linePlots{2}.plotCallMarker = ['markerPlot = semilogy(spacingMarker, currentDataMarker', ...
+    ', "LineStyle", "none"' ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Legend plot call 
+linePlots{2}.plotCallLegend = ['legendPlot = semilogy(-0.001, 0', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Type of the plot, used to to generate file name
+linePlots{2}.plotType = 'coverage';
+% ID of first method to plotted
+linePlots{2}.firstMethodID = 1;  
+% Whether to add a horizontal line and at which level
 linePlots{2}.yLine = [];
+% Whether to add legend
+linePlots{2}.plotLegend = true;
+% Legend position
 linePlots{2}.legendPosition = [0.844, 0.085, 0.1, 0.07];
+% Exponent for nonlinearly transforming Y axis
 linePlots{2}.spacingExponentY = 1;
+% Whether special ticks for the Y axis should be used and which
 linePlots{2}.yTicks = [];
+% Suptitle for the overall plot
+linePlots{2}.suptitle = '\textbf{Length}';
 
-% Plot 3: MAE of estimator relative
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Plot 3: relative MAE of adjusted estimator %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 linePlots{3}.yLim = [0, 2];
 
 linePlots{3}.computeData = ...
@@ -82,9 +145,16 @@ linePlots{3}.legendPosition = [0.844, 0.414, 0.1, 0.07];
 linePlots{3}.spacingExponentY = 1;
 linePlots{3}.yTicks = 0:0.5:2;
 
-% Coverage and length plots (Color)
 
+%%%%%%%%%%%%%%%%%%%%%%%
+%%% Plot generation %%%
 
+switch colorMode
+    case 'color'
+        colorField = 'plottingColor';
+    case 'BW'
+        colorField = 'plottingColorBW';
+end
 % Extract number of sample sizes used. 
 % N indexes rows; T indexes columns
 numN = length(Ns);
@@ -95,7 +165,7 @@ samplerTable = combinations(thetaDistrsArray, uDistrsArray);
 
 % Each combination of distributions receives their own plot
 
-for plotID = 1:1 % 3:length(linePlots)
+for plotID = 2:2 % 3:length(linePlots)
     for plotDGPID = 1:1 % height(samplerTable)
 
         % Create figure
@@ -109,7 +179,7 @@ for plotID = 1:1 % 3:length(linePlots)
         end
     
         % Use tight_subplots
-        [ha, ~] = tight_subplot(numN, numT,[.07 .023],[.07 .05],[.05 .04]);
+        [ha, ~] = tight_subplot(numN, numT,[.07 .036],[.07 .105],[.05 .04]);
 
         % Loop over (N, T): each combination receives a subplot
         for tID = 1:numT
@@ -212,22 +282,37 @@ for plotID = 1:1 % 3:length(linePlots)
                 ttl.Position(1) = 0;
                 ttl.HorizontalAlignment = 'left';
 
-                % Display legend on last plot
-                if plotNum == numN*numT
+                % Display legend on last plot if legend is required
+                if plotNum == numN*numT && linePlots{plotID}.plotLegend 
                     legend('Position', linePlots{plotID}.legendPosition)
                 end
 
             end
         end
+        % Add suptitle 
+        sgt = sgtitle(linePlots{plotID}.suptitle);
+        
+        % Force MATLAB to render the figure and its components
+        drawnow;
 
+        % Adjust positions of the suptitle
+        % sgt.NodeChildren.Children(2).Units = 'Normalize';
+        % sgt.NodeChildren.Children(2).Position(2) = 0.98;
+        % sgt.NodeChildren.Children(2).Position(1) = 0.08;
+
+        
+        
+        
         % Create figure saving name
-        figureSavingName =   "figures/" + simContext + "_" + ...
+        figureSavingName =   "results/figures/" + simContext + "_" + ...
             linePlots{plotID}.plotType + "_" + ...
             thetaSampler.distrMachineName + "_" + ...
             uSampler.distrMachineName;
 
+
+
         % Export as PNG
-        set(gcf, 'PaperPosition', [0 0 plotRatioAllCoverages*10 10])
+        set(gcf, 'PaperPosition', [0 0 plotRatioAllCoverages*8 8])
         print(gcf, figureSavingName, '-dpng', '-r300' );
 
         % Prepare export settings for PDF
