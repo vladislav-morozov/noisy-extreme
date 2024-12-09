@@ -30,7 +30,7 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
     % selecting a range of candidate values and the size of the moving 
     % window. The results are not sensitive to these choices. The following 
     % values are used by default, but they can be replaced with arguments.
-    candidateSizes = floor(linspace( 0.5*N^(4/5), 2*N^(4/5), 20));
+    candidateSizes = floor(linspace( 0.7*N^(4/5), 2*N^(4/5), 20));
     mvMovingAverageSize = 5;
     
     % Check which version of subsampling to apply
