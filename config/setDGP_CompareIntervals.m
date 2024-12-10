@@ -1,20 +1,20 @@
 % ===========================================================
 % File: setDGP_CompareIntervals.m
-%
 % Description: This script implements the data generating processes for the
-% unobserved coefficients theta and the unobserved shocks u used in the
-% main comparison simulation
-% 
-% Notes:
-%  1. Each DGP must be an instance of the dataSampler class
-%  2. Names of theta distributions must start with thetaSampler; names of
-%     shocks distributions must start with uSampler.  
-%  3. All of the DGPs with appropriate names will be used for simulations.
+%              unobserved coefficients theta and the unobserved shocks u 
+%              used in the main comparison simulation
+%
+% ===========================================================
 %
 % Project Name: Inference on Extreme Quantiles of Unobserved 
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
 %
+% Notes:
+%  1. Each DGP must be an instance of the dataSampler class
+%  2. Names of theta distributions must start with thetaSampler; names of
+%     shocks distributions must start with uSampler.  
+%  3. All of the DGPs with appropriate names will be used for simulations.
 % ===========================================================
 
 %% Theta: Frechet distribution
@@ -108,4 +108,3 @@ thetaDistrsArray = findAndCollect('thetaSampler');
 
 % Collect all defined distributions for u
 uDistrsArray = findAndCollect('uSampler');
- 
