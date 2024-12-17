@@ -1,14 +1,18 @@
 % ===========================================================
 % File: setConfidenceIntervalMethods_CompareIntervals.m
 % Description: This script describes the confidence intervals to be
-% evaluated in the main simulation.
-% Each confidence interval must be an instance of the
-% quantileEstimatorConfidenceIntervalArray class. 
-% Note: quantileEstimatorConfidenceIntervalArray is a value class.
+%              evaluated in the main simulation.
+%
+% ===========================================================
 %
 % Project Name: Inference on Extreme Quantiles of Unobserved 
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
+%
+% Each confidence interval must be an instance of the
+% quantileEstimatorConfidenceIntervalArray class. 
+%
+% Note: quantileEstimatorConfidenceIntervalArray is a value class.
 %
 % ===========================================================
 
