@@ -1,9 +1,24 @@
+% ===========================================================
+% File: exportFigures.m
+% Description: This script exports the figures based on simulations for
+%              comparing various confidence intervals for extreme
+%              quantiles.
+%
+% ===========================================================
+%
+% Project Name: Inference on Extreme Quantiles of Unobserved 
+%               Individual Heterogeneity
+% Author: Vladislav Morozov
+%
+% Plot creation is 
+%
+% Created figures are saved in the 'results/figures/' folder.
+% ===========================================================
+
+
 %% Load in common tuning parameters
 
 setPlottingParameters
-
-% Set color plot. Options are 'color' and 'BW'
-colorMode = 'color'; 
 
 %% Plot descriptions
 
@@ -57,13 +72,13 @@ linePlots{1}.firstMethodID = 1;
 % Whether to add a horizontal line and at which level
 linePlots{1}.yLine = 1-alphaCI;
 % Whether to add legend
-linePlots{1}.plotLegend = false;
+linePlots{1}.plotLegend = true;
 % Legend position
-linePlots{1}.legendPosition = [0.844, 0.085, 0.1, 0.07];
+linePlots{1}.legendPosition = [0.7355, 0.12, 0.1, 0.04];
 % Exponent for nonlinearly transforming Y axis
 linePlots{1}.spacingExponentY = 2.7;
 % Whether special ticks for the Y axis should be used and which
-linePlots{1}.yTicks = [0, 0.4:0.1:0.9, 1-alphaCI, 1];
+linePlots{1}.yTicks = [0, 0.5:0.1:0.9, 1-alphaCI, 1];
 % Suptitle for the overall plot
 linePlots{1}.suptitle = '\textbf{Coverage}';
 
@@ -75,7 +90,7 @@ linePlots{1}.suptitle = '\textbf{Coverage}';
 % Limits for y axis
 linePlots{2}.yLim = [];
 % Label for y axis
-linePlots{2}.yLabel = 'Interval Length';
+linePlots{2}.yLabel = 'Interval length';
 % Method for processing data to plot
 linePlots{2}.computeData = ...
     @(resultsArray, methodID) ...
@@ -105,7 +120,7 @@ linePlots{2}.plotCallLegend = ['legendPlot = semilogy(-0.001, 0', ...
     ', "Color", methodsCI{methodID}.(colorField)', ...
     ', "DisplayName", methodsCI{methodID}.legendName);'];
 % Type of the plot, used to to generate file name
-linePlots{2}.plotType = 'coverage';
+linePlots{2}.plotType = 'length';
 % ID of first method to plotted
 linePlots{2}.firstMethodID = 1;  
 % Whether to add a horizontal line and at which level
@@ -113,11 +128,11 @@ linePlots{2}.yLine = [];
 % Whether to add legend
 linePlots{2}.plotLegend = true;
 % Legend position
-linePlots{2}.legendPosition = [0.844, 0.085, 0.1, 0.07];
+linePlots{2}.legendPosition = [0.7355, 0.12, 0.1, 0.04];
 % Exponent for nonlinearly transforming Y axis
 linePlots{2}.spacingExponentY = 1;
 % Whether special ticks for the Y axis should be used and which
-linePlots{2}.yTicks = [];
+linePlots{2}.yTicks = [0.1, 1, 10, 100, 1000, 5000];
 % Suptitle for the overall plot
 linePlots{2}.suptitle = '\textbf{Length}';
 
@@ -126,28 +141,66 @@ linePlots{2}.suptitle = '\textbf{Length}';
 %%% Plot 3: relative MAE of adjusted estimator %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-linePlots{3}.yLim = [0, 2];
-
-linePlots{3}.computeData = ...
-    @(resultsArray, methodID) mean(abs(resultsArray{methodID}.estError).^2)./...
-            mean(abs(resultsArray{1}.estError).^2);
-
-linePlots{3}.plotCall = ['plot(spacing, smooth(currentData)', ...
-                         ', methodsCI{methodID}.plottingLineStyle', ...
-                         ', "LineWidth", plotLineThickness', ...
-                         ', "Color", methodsCI{methodID}.plottingColor', ...
-                         ', "DisplayName", methodsCI{methodID}.legendName)'];
-linePlots{3}.plotType = 'estError';
-linePlots{3}.firstMethodID = 2;  
+% Limits for y axis
+linePlots{3}.yLim = [0, 1.25];
+% Label for y axis
 linePlots{3}.yLabel = 'Relative MSE';
-linePlots{3}.yLine  = 1;
-linePlots{3}.legendPosition = [0.844, 0.414, 0.1, 0.07];
+% Method for processing data to plot
+linePlots{3}.computeData = ...
+    @(resultsArray, methodID) ...
+        smoothdata(nanmean(abs(resultsArray{methodID}.estError).^2)./...
+            nanmean(abs(resultsArray{1}.estError).^2), ...
+             "gaussian", 10);
+
+% Line plot call
+linePlots{3}.plotCallLine = ['linePlot = plot(spacing, currentData', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Marker plot call
+linePlots{3}.plotCallMarker = ['markerPlot = plot(spacingMarker, currentDataMarker', ...
+    ', "LineStyle", "none"' ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Legend plot call
+linePlots{3}.plotCallLegend = ['legendPlot = plot(-0.001, 0', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Type of the plot, used to to generate file name
+linePlots{3}.plotType = 'estError';
+% ID of first method to plotted
+linePlots{3}.firstMethodID = 2;  
+% Whether to add a horizontal line and at which level
+linePlots{3}.yLine = 1; 
+% Whether to add legend
+linePlots{3}.plotLegend = true;
+% Legend position
+linePlots{3}.legendPosition = [0.7355, 0.108, 0.1, 0.04];
+% Exponent for nonlinearly transforming Y axis
 linePlots{3}.spacingExponentY = 1;
-linePlots{3}.yTicks = 0:0.5:2;
+% Whether special ticks for the Y axis should be used and which
+linePlots{3}.yTicks = [0:0.5:1, 1.25];
+% Suptitle for the overall plot
+linePlots{3}.suptitle = '\textbf{Efficiency of Corrected Estimators Relative to Sample Quantile}';
 
 
-%%%%%%%%%%%%%%%%%%%%%%%
-%%% Plot generation %%%
+
+
+
+
+
+% TEMP
+Ns = [200, 2000, 10000];
+ 
+% --- Plot generation ---
 
 switch colorMode
     case 'color'
@@ -165,8 +218,8 @@ samplerTable = combinations(thetaDistrsArray, uDistrsArray);
 
 % Each combination of distributions receives their own plot
 
-for plotID = 2:2 % 3:length(linePlots)
-    for plotDGPID = 1:1 % height(samplerTable)
+for plotID = 1 :length(linePlots)
+    for plotDGP_ID = 10 : height(samplerTable)
 
         % Create figure
         if plotQuietly ~= 1
@@ -178,24 +231,34 @@ for plotID = 2:2 % 3:length(linePlots)
                 'Position', [50 50 plotWallCoverages plotHallCoverages]);
         end
     
+ 
+
         % Use tight_subplots
-        [ha, ~] = tight_subplot(numN, numT,[.07 .036],[.07 .105],[.05 .04]);
+        [has, ~] = tight_subplot(3, 3,[.07 .036],[.07 .105],[.05 .04]); % tight_subplot(numN, numT,[.07 .036],[.07 .105],[.05 .04]);
 
         % Loop over (N, T): each combination receives a subplot
-        for tID = 1:numT
-            for nID = 1:numN
+        for NID = 1:numT
+            for TID = 1:numN
+
+                                % TEMP
+                Ns = [200, 2000, 10000];
+                numN = 3;
+                numT = 3;
+                numSamples = 3333;
 
                 % Create subplot
-                plotNum = (nID-1)*numT+tID;
-                axes(ha(plotNum)) %, 'Parent', p);
+                plotNum = (TID-1)*numT+NID;
+                axes(has(plotNum))  
+
+
 
                 % Extract current sample sizes
-                N = Ns(nID);
-                T = Ts(tID);
+                N = Ns(TID);
+                T = Ts(NID);
 
                 % Extract current samplers for theta and u
-                thetaSampler = samplerTable{plotDGPID, 1}{1};
-                uSampler = samplerTable{plotDGPID, 2}{1};
+                thetaSampler = samplerTable{plotDGP_ID, 1}{1};
+                uSampler = samplerTable{plotDGP_ID, 2}{1};
 
                 % Load in corresponding simulation result file
                 fileName = makeOutputFileName(thetaSampler, uSampler, ...
@@ -205,6 +268,9 @@ for plotID = 2:2 % 3:length(linePlots)
                 
                 % Patch colors 
                 setConfidenceIntervalMethods_CompareIntervals
+
+                % TEMP: patch parameters
+                setPlottingParameters
 
                 % Set spacing based on the quantiles in the loaded file
                 spacing = 1:length(targetQuantilesDGP);
@@ -238,12 +304,15 @@ for plotID = 2:2 % 3:length(linePlots)
                 xticks([spacing(1:spacingStep:end), spacing(end)])
                 % Erase x-tick and y-tick labels by default
                 xticklabels([])
+
+
                 defaultYTicks = gca().YTick;
                 yticklabels([])
+                
                 % Set x-axis limits according to spacing
                 xlim([min(spacing), max(spacing)]);
                 % Add x-tick labels and axis label only on the bottom plots
-                if nID == numN
+                if TID == numN
                     xlabel('Quantile')
                     xticklabels([targetQuantilesDGP(1:spacingStep:end), targetQuantilesDGP(end)])
                 end
@@ -259,15 +328,17 @@ for plotID = 2:2 % 3:length(linePlots)
                     hV.HandleVisibility='off';
                 end
 
-                 
-                yticks( linePlots{plotID}.yTicks.^linePlots{plotID}.spacingExponentY)
+                if ~isempty(linePlots{plotID}.yTicks)
+                    yticks(linePlots{plotID}.yTicks.^linePlots{plotID}.spacingExponentY)
+                end
                 % y label and ticks only on the left plots
-                if tID == 1
+                if NID == 1
                     ylabel(linePlots{plotID}.yLabel)
 
                     %
                     if isempty(linePlots{plotID}.yTicks)
                         yticklabels(defaultYTicks)
+
                     else
                         
                         yticklabels( linePlots{plotID}.yTicks)
@@ -277,32 +348,22 @@ for plotID = 2:2 % 3:length(linePlots)
  
 
                 % Add a title to the subplot and left-justify it
-                ttl = title("N="+num2str(Ns(nID))+", T="+num2str(Ts(tID)));
+                ttl = title("N="+num2str(Ns(TID))+", T="+num2str(Ts(NID)));
                 ttl.Units = 'Normalize';
                 ttl.Position(1) = 0;
                 ttl.HorizontalAlignment = 'left';
 
                 % Display legend on last plot if legend is required
                 if plotNum == numN*numT && linePlots{plotID}.plotLegend 
-                    legend('Position', linePlots{plotID}.legendPosition)
+                    lgd = legend('Position', linePlots{plotID}.legendPosition);
+                    fontsize(lgd, 6.5,'points')
                 end
 
             end
         end
         % Add suptitle 
         sgt = sgtitle(linePlots{plotID}.suptitle);
-        
-        % Force MATLAB to render the figure and its components
-        drawnow;
-
-        % Adjust positions of the suptitle
-        % sgt.NodeChildren.Children(2).Units = 'Normalize';
-        % sgt.NodeChildren.Children(2).Position(2) = 0.98;
-        % sgt.NodeChildren.Children(2).Position(1) = 0.08;
-
-        
-        
-        
+               
         % Create figure saving name
         figureSavingName =   "results/figures/" + simContext + "_" + ...
             linePlots{plotID}.plotType + "_" + ...
@@ -321,6 +382,16 @@ for plotID = 2:2 % 3:length(linePlots)
         set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
         % Export as PDF
         print(gcf, figureSavingName, '-dpdf');
+
+
+        % TEMP
+        numN = 3;
+                numT = 3;
+
+                    
+
+
+         plotDGP_ID
     end
 
 end
