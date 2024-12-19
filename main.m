@@ -3,29 +3,40 @@
 %               Individual Heterogeneity
 % File: main.m
 % Developed by: Vladislav Morozov
-% Contact: Vladislav Morozov (vladislav.morozov (at) barcelonagse.eu)
-%
+% Contact: Vladislav Morozov (morozov (at) uni-bonn.de)
+% ===========================================================
 %
 % Description:
 %   This script runs the simulations on confidence intervals for extreme
 %   quantiles. 
 %
+% Usage: 
+%   To reproduce the full set of simulation results, execute this script 
+%   directly. The script will generate all necessary outputs, including 
+%   figures and tables, which are automatically saved to the 'results' 
+%   folder.
 %
-% Link to paper:  
-% Link to the appendix: 
+% Output: 
+%   - The results of the simulation are saved in the 'results/simulation' 
+%     folder.
+%   - Figures and plots are saved in the 'results/figures' folder.
+%
+% For simulation design and overall background on unit averaging:
+%  - Link to paper: 
+%     arxiv.org/abs/2210.08524 
+%  - Link to the appendix: 
+%     vladislav-morozov.github.io/assets/files/2_noisyExtremeSupplement.pdf
 % 
-%
-% MATLAB Version:
-%   Tested with MATLAB R2024b
-% 
-%
-% Instructions:
-%   - Ensure that
-%   - Run this script to execute the entire simulation.
+% Software Requirements:
+%   - MATLAB (tested on R2024b). 
+%   - Toolboxes: 
+%       - Parallel Computing Toolbox (used for simulation speed-up). 
+%   - Additional File Exchange Dependencies:
+%       - `table2latex` (for LaTeX table generation). 
+%       - `tight_subplot` (for subplot layout optimization). 
+%         Both dependencies are provided in the replication package.
 %
 % Outputs:
-%   - The results of the simulation are saved in the 'results' folder.
-%   - Figures and plots are saved in the 'results/figures' folder.
 % ===========================================================
 %% Initialization
 
@@ -35,22 +46,18 @@ clear variables
 close all
 
 % Load the required folders
-addpath('classes') % implemented classes
-addpath('config') % setting simulation parameters
-addpath('confidenceIntervals') % implemented CI and estimator methods
-addpath('distributions') % Data generating processes
-addpath('simulationScriptsFunctions') % Scripts for running simulations
-addpath('plotting') % Scripts for generating figures
-addpath('utilities') % further useful scripts and functions
+addpath(genpath('src')) % implemented classes
+addpath(genpath('scripts')) % implemented classes
+
+
 
 %% Simulation configuration
  
 % Set the random number generator
 rng(1,'multFibonacci')
  
-
 % Sample sizes
-Ns = [200, 2000];
+Ns = [200, 2000, 10000];
 Ts = [10, 20, 50];
 
 % Confidence interval parameter
@@ -61,8 +68,6 @@ targetQuantiles = [0.9:0.005:0.99, 0.9905:0.0005:1];
 
 % Exporting result
 plotQuietly = 0; % if 0, export figures without opening them 
-
-
 
 %% Specifying the data generating distributions
 % The model considered is y_{it} = \theta_i'x_{it} + u_{it}
@@ -76,32 +81,45 @@ sigmaSqX = 1; % Variance of x
 rhoTheta = 0.5; % Correlation between individual coordinates of theta
 rhoXtheta = 0.5; % Correlation between x and theta
 
-numSamples = 5000; % number of replication samples
+numSamples = 3334; % number of replication samples
 numSubsamples = 5e3; % number of subsamples   
 numBootstrapSamples = 1e3        ; % number of bootstrap samples
 
-
-
-
-
- 
    
 
 %% Block 1: comparison of extreme, intermediate, central methods
 
 % Load in the distributions for theta and u
-setDGP
+setDGP_CompareIntervals
 
 % Load in methods
-setConfidenceIntervalMethods
+setConfidenceIntervalMethods_CompareIntervals
  
 % Run the simulation
+simContext = "methods";
 simulateCoverages
 
 % Export plots
 
 
-%% Block 2: impact of choice of the tuning parameter in the denominator
- 
+% Block 2: impact of choice of the tuning parameter in the denominator
+
+% Load in DGPs
+setDGP_ExtremeTuningParameters
+
+% Load in confidence intervals (extreme approximations)
+setConfidenceIntervalMethods_ExtremeTuningParameters
+simContext = "tuningParameter";
+numSamples = 3334;
+simulateCoverages
 
 %% Block 3: quality of approximation in the feasible IVT 
+
+% Load in DGPs
+setDGP_IntermediateApproximationQuality
+
+
+% Set simulation name
+simContext = "intermediateQuality";
+numSamples = 5000;
+simulateIVTNormality
