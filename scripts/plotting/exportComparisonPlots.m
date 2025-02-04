@@ -74,13 +74,13 @@ linePlots{1}.yLine = 1-alphaCI;
 % Whether to add legend
 linePlots{1}.plotLegend = true;
 % Legend position
-linePlots{1}.legendPosition = [0.7355, 0.12, 0.1, 0.04];
+linePlots{1}.legendPosition = [0.726, 0.112, 0.1, 0.04];
 % Exponent for nonlinearly transforming Y axis
 linePlots{1}.spacingExponentY = 2.7;
 % Whether special ticks for the Y axis should be used and which
 linePlots{1}.yTicks = [0, 0.5:0.1:0.9, 1-alphaCI, 1];
 % Suptitle for the overall plot
-linePlots{1}.suptitle = '\textbf{Coverage}';
+linePlots{1}.suptitle = '\textbf{Coverage of a 95\% Confidence Interval, by Target Quantile}';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -128,13 +128,13 @@ linePlots{2}.yLine = [];
 % Whether to add legend
 linePlots{2}.plotLegend = true;
 % Legend position
-linePlots{2}.legendPosition = [0.7355, 0.12, 0.1, 0.04];
+linePlots{2}.legendPosition = linePlots{1}.legendPosition;
 % Exponent for nonlinearly transforming Y axis
 linePlots{2}.spacingExponentY = 1;
 % Whether special ticks for the Y axis should be used and which
 linePlots{2}.yTicks = [0.1, 1, 10, 100, 1000, 5000];
 % Suptitle for the overall plot
-linePlots{2}.suptitle = '\textbf{Length}';
+linePlots{2}.suptitle = '\textbf{Length of a 95\% Confidence Interval, by Target Quantile}';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -183,24 +183,17 @@ linePlots{3}.yLine = 1;
 % Whether to add legend
 linePlots{3}.plotLegend = true;
 % Legend position
-linePlots{3}.legendPosition = [0.7355, 0.108, 0.1, 0.04];
+linePlots{3}.legendPosition = linePlots{1}.legendPosition;
 % Exponent for nonlinearly transforming Y axis
 linePlots{3}.spacingExponentY = 1;
 % Whether special ticks for the Y axis should be used and which
 linePlots{3}.yTicks = [0:0.5:1, 1.25];
 % Suptitle for the overall plot
-linePlots{3}.suptitle = '\textbf{Efficiency of Corrected Estimators Relative to Sample Quantile}';
+linePlots{3}.suptitle = '\textbf{Efficiency of Corrected Estimators Relative to Sample Quantile, by Target Quantile}';
 
 
-
-
-
-
-
-% TEMP
-Ns = [200, 2000, 10000];
  
-% --- Plot generation ---
+%% --- Plot generation ---
 
 switch colorMode
     case 'color'
@@ -218,8 +211,8 @@ samplerTable = combinations(thetaDistrsArray, uDistrsArray);
 
 % Each combination of distributions receives their own plot
 
-for plotID = 1 :length(linePlots)
-    for plotDGP_ID = 10 : height(samplerTable)
+for plotID = 1 : length(linePlots)
+    for plotDGP_ID = 1 : height(samplerTable)
 
         % Create figure
         if plotQuietly ~= 1
@@ -234,17 +227,14 @@ for plotID = 1 :length(linePlots)
  
 
         % Use tight_subplots
-        [has, ~] = tight_subplot(3, 3,[.07 .036],[.07 .105],[.05 .04]); % tight_subplot(numN, numT,[.07 .036],[.07 .105],[.05 .04]);
+        [has, ~] = tight_subplot(3, 3,[.07 .036],[.07 .145],[.05 .04]); % tight_subplot(numN, numT,[.07 .036],[.07 .105],[.05 .04]);
 
         % Loop over (N, T): each combination receives a subplot
         for NID = 1:numT
             for TID = 1:numN
 
-                                % TEMP
-                Ns = [200, 2000, 10000];
-                numN = 3;
-                numT = 3;
-                numSamples = 3333;
+ 
+                numSamples = 3334;
 
                 % Create subplot
                 plotNum = (TID-1)*numT+NID;
@@ -266,11 +256,15 @@ for plotID = 1 :length(linePlots)
                     numSamples, simContext);
                 load(fileName)
                 
-                % Patch colors 
+                % ------------- Patches 
+                % Patch colors and plotting parameters if these have been
+                % changed after creation
                 setConfidenceIntervalMethods_CompareIntervals
-
-                % TEMP: patch parameters
                 setPlottingParameters
+                % Patch incorrect name on Gbeta
+                if uSampler.distrLegendName == "G_{\kappa}"
+                    uSampler.distrLegendName = "G_{\beta}";
+                end
 
                 % Set spacing based on the quantiles in the loaded file
                 spacing = 1:length(targetQuantilesDGP);
@@ -361,11 +355,17 @@ for plotID = 1 :length(linePlots)
 
             end
         end
-        % Add suptitle 
-        sgt = sgtitle(linePlots{plotID}.suptitle);
-               
+        % Add suptitle  
+        sgt = sgtitle({linePlots{plotID}.suptitle, ...
+            "$F = " + thetaSampler.distrLegendName + "$, " + ...
+            "$G = " + uSampler.distrLegendName + "$", ...
+            }, ...
+            'interpreter','latex');  
+
         % Create figure saving name
-        figureSavingName =   "results/figures/" + simContext + "_" + ...
+        figureSavingName =   "results/figures/" + ...
+            colorMode + "_" + ...
+            simContext + "_" + ...
             linePlots{plotID}.plotType + "_" + ...
             thetaSampler.distrMachineName + "_" + ...
             uSampler.distrMachineName;
@@ -384,10 +384,7 @@ for plotID = 1 :length(linePlots)
         print(gcf, figureSavingName, '-dpdf');
 
 
-        % TEMP
-        numN = 3;
-                numT = 3;
-
+ 
                     
 
 
