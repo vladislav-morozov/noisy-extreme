@@ -13,15 +13,7 @@
 % Plot creation is 
 %
 % Created figures are saved in the 'results/figures/' folder.
-% ===========================================================
-
-
-%% Load in common tuning parameters
-
-setPlottingParameters
-
-%% Plot descriptions
-
+%
 % Implementation notes: 
 % 1. Since different plots are required, plot type is supplied as a string,
 %    and called with eval.
@@ -29,190 +21,48 @@ setPlottingParameters
 %    sparse collection of markers. Finally, a dummy plot with both the line
 %    and the markers. The dummy plot is the one used to draw the legend.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Plot 1: coverages %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Limits for y axis
-linePlots{1}.yLim = [0, 1];
-% Label for y axis
-linePlots{1}.yLabel = 'Coverage';
-% Method for processing data to plot
-linePlots{1}.computeData = ...
-    @(resultsArray, methodID) ...
-        smoothdata(...
-        computeCoverageLengthNonNaN(resultsArray, methodID, 'coverage'), ...
-        "gaussian", 10);
-% Line plot call
-linePlots{1}.plotCallLine = ['linePlot = plot(spacing, currentData', ...
-    ', methodsCI{methodID}.plottingLineStyle', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Marker plot call
-linePlots{1}.plotCallMarker = ['markerPlot = plot(spacingMarker, currentDataMarker', ...
-    ', "LineStyle", "none"' ...
-    ', "Marker", methodsCI{methodID}.plottingMarker', ...
-    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Legend plot call
-linePlots{1}.plotCallLegend = ['legendPlot = plot(-0.001, 0', ...
-    ', methodsCI{methodID}.plottingLineStyle', ...
-    ', "Marker", methodsCI{methodID}.plottingMarker', ...
-    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Type of the plot, used to to generate file name
-linePlots{1}.plotType = 'coverage';
-% ID of first method to plotted
-linePlots{1}.firstMethodID = 1;
-% Whether to add a horizontal line and at which level
-linePlots{1}.yLine = 1-alphaCI;
-% Whether to add legend
-linePlots{1}.plotLegend = true;
-% Legend position
-linePlots{1}.legendPosition = [0.726, 0.112, 0.1, 0.04];
-% Exponent for nonlinearly transforming Y axis
-linePlots{1}.spacingExponentY = 2.7;
-% Whether special ticks for the Y axis should be used and which
-linePlots{1}.yTicks = [0, 0.5:0.1:0.9, 1-alphaCI, 1];
-% Suptitle for the overall plot
-linePlots{1}.suptitle = '\textbf{Coverage of a 95\% Confidence Interval, by Target Quantile}';
+% ===========================================================
 
 
-%%%%%%%%%%%%%%%%%%%%%%%
-%%% Plot 2: lengths %%%
-%%%%%%%%%%%%%%%%%%%%%%%
+%% Load in common tuning parameters
 
-% Limits for y axis
-linePlots{2}.yLim = [];
-% Label for y axis
-linePlots{2}.yLabel = 'Interval length';
-% Method for processing data to plot
-linePlots{2}.computeData = ...
-    @(resultsArray, methodID) ...
-        smoothdata(...
-        computeCoverageLengthNonNaN(resultsArray, methodID, 'length'), ...
-        "gaussian", 10);
-% Line plot call
-linePlots{2}.plotCallLine = ['linePlot = semilogy(spacing, currentData', ...
-    ', methodsCI{methodID}.plottingLineStyle', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Marker plot call
-linePlots{2}.plotCallMarker = ['markerPlot = semilogy(spacingMarker, currentDataMarker', ...
-    ', "LineStyle", "none"' ...
-    ', "Marker", methodsCI{methodID}.plottingMarker', ...
-    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Legend plot call 
-linePlots{2}.plotCallLegend = ['legendPlot = semilogy(-0.001, 0', ...
-    ', methodsCI{methodID}.plottingLineStyle', ...
-    ', "Marker", methodsCI{methodID}.plottingMarker', ...
-    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Type of the plot, used to to generate file name
-linePlots{2}.plotType = 'length';
-% ID of first method to plotted
-linePlots{2}.firstMethodID = 1;  
-% Whether to add a horizontal line and at which level
-linePlots{2}.yLine = [];
-% Whether to add legend
-linePlots{2}.plotLegend = true;
-% Legend position
-linePlots{2}.legendPosition = linePlots{1}.legendPosition;
-% Exponent for nonlinearly transforming Y axis
-linePlots{2}.spacingExponentY = 1;
-% Whether special ticks for the Y axis should be used and which
-linePlots{2}.yTicks = [0.1, 1, 10, 100, 1000, 5000];
-% Suptitle for the overall plot
-linePlots{2}.suptitle = '\textbf{Length of a 95\% Confidence Interval, by Target Quantile}';
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Plot 3: relative MAE of adjusted estimator %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Limits for y axis
-linePlots{3}.yLim = [0, 1.25];
-% Label for y axis
-linePlots{3}.yLabel = 'Relative MSE';
-% Method for processing data to plot
-linePlots{3}.computeData = ...
-    @(resultsArray, methodID) ...
-        smoothdata(nanmean(abs(resultsArray{methodID}.estError).^2)./...
-            nanmean(abs(resultsArray{1}.estError).^2), ...
-             "gaussian", 10);
-
-% Line plot call
-linePlots{3}.plotCallLine = ['linePlot = plot(spacing, currentData', ...
-    ', methodsCI{methodID}.plottingLineStyle', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Marker plot call
-linePlots{3}.plotCallMarker = ['markerPlot = plot(spacingMarker, currentDataMarker', ...
-    ', "LineStyle", "none"' ...
-    ', "Marker", methodsCI{methodID}.plottingMarker', ...
-    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Legend plot call
-linePlots{3}.plotCallLegend = ['legendPlot = plot(-0.001, 0', ...
-    ', methodsCI{methodID}.plottingLineStyle', ...
-    ', "Marker", methodsCI{methodID}.plottingMarker', ...
-    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
-    ', "LineWidth", plotLineThickness', ...
-    ', "Color", methodsCI{methodID}.(colorField)', ...
-    ', "DisplayName", methodsCI{methodID}.legendName);'];
-% Type of the plot, used to to generate file name
-linePlots{3}.plotType = 'estError';
-% ID of first method to plotted
-linePlots{3}.firstMethodID = 2;  
-% Whether to add a horizontal line and at which level
-linePlots{3}.yLine = 1; 
-% Whether to add legend
-linePlots{3}.plotLegend = true;
-% Legend position
-linePlots{3}.legendPosition = linePlots{1}.legendPosition;
-% Exponent for nonlinearly transforming Y axis
-linePlots{3}.spacingExponentY = 1;
-% Whether special ticks for the Y axis should be used and which
-linePlots{3}.yTicks = [0:0.5:1, 1.25];
-% Suptitle for the overall plot
-linePlots{3}.suptitle = '\textbf{Efficiency of Corrected Estimators Relative to Sample Quantile, by Target Quantile}';
-
-
+setPlottingParameters
+chooseLinePlotsMethodsComparison
+ 
  
 %% --- Plot generation ---
 
+% Set color mode
 switch colorMode
     case 'color'
         colorField = 'plottingColor';
     case 'BW'
         colorField = 'plottingColorBW';
 end
+
+% Set (N, T) vectors to use in plotting
+switch destination
+    case 'main'
+        NsPlot = [Ns(1), Ns(2)];
+        TsPlot = [Ts(1), Ts(end)];
+    case 'OA'
+        NsPlot = Ns;
+        TsPlot = Ts;
+end
+
+
 % Extract number of sample sizes used. 
 % N indexes rows; T indexes columns
-numN = length(Ns);
-numT = length(Ts);
+numN = length(NsPlot);
+numT = length(TsPlot);
 
 % Zip together distribution samplers in the format (thetaSampler, uSampler)
 samplerTable = combinations(thetaDistrsArray, uDistrsArray);
 
 % Each combination of distributions receives their own plot
 
-for plotID = 1 : length(linePlots)
-    for plotDGP_ID = 1 : height(samplerTable)
+for plotID = 1 : 1 % length(linePlots)
+    for plotDGP_ID = 1 : 1 %  height(samplerTable)
 
         % Create figure
         if plotQuietly ~= 1
@@ -227,24 +77,18 @@ for plotID = 1 : length(linePlots)
  
 
         % Use tight_subplots
-        [has, ~] = tight_subplot(3, 3,[.07 .036],[.07 .145],[.05 .04]); % tight_subplot(numN, numT,[.07 .036],[.07 .105],[.05 .04]);
+        [has, ~] = tight_subplot(numN, numT,[.07 .036],[.07 .145],[.05 .04]); % tight_subplot(numN, numT,[.07 .036],[.07 .105],[.05 .04]);
 
         % Loop over (N, T): each combination receives a subplot
         for NID = 1:numT
             for TID = 1:numN
-
- 
-                numSamples = 3334;
-
                 % Create subplot
                 plotNum = (TID-1)*numT+NID;
                 axes(has(plotNum))  
 
-
-
                 % Extract current sample sizes
-                N = Ns(TID);
-                T = Ts(NID);
+                N = NsPlot(TID);
+                T = TsPlot(NID);
 
                 % Extract current samplers for theta and u
                 thetaSampler = samplerTable{plotDGP_ID, 1}{1};
@@ -257,21 +101,20 @@ for plotID = 1 : length(linePlots)
                 load(fileName)
                 
                 % ------------- Patches 
-                % Patch colors and plotting parameters if these have been
-                % changed after creation
-                setConfidenceIntervalMethods_CompareIntervals
-                setPlottingParameters
+                % Patch colors if these have been changed after creation
+                setConfidenceIntervalMethods_CompareIntervals 
+
                 % Patch incorrect name on Gbeta
                 if uSampler.distrLegendName == "G_{\kappa}"
                     uSampler.distrLegendName = "G_{\beta}";
                 end
 
+                
                 % Set spacing based on the quantiles in the loaded file
                 spacing = 1:length(targetQuantilesDGP);
                 spacing= (spacing).^spacingExponent;
                 spacingMarker = spacing(1:markerStep:end);
              
-
                 % Loop through confidence interval methods
                 for methodID = linePlots{plotID}.firstMethodID:numMethods
                     % Compute data to plot
@@ -340,9 +183,8 @@ for plotID = 1 : length(linePlots)
 
                 end
  
-
                 % Add a title to the subplot and left-justify it
-                ttl = title("N="+num2str(Ns(TID))+", T="+num2str(Ts(NID)));
+                ttl = title("N="+num2str(NsPlot(TID))+", T="+num2str(TsPlot(NID)));
                 ttl.Units = 'Normalize';
                 ttl.Position(1) = 0;
                 ttl.HorizontalAlignment = 'left';
@@ -383,12 +225,6 @@ for plotID = 1 : length(linePlots)
         % Export as PDF
         print(gcf, figureSavingName, '-dpdf');
 
-
- 
-                    
-
-
-         plotDGP_ID
+        disp(plotDGP_ID)
     end
-
 end
