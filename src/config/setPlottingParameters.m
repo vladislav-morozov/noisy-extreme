@@ -30,6 +30,6 @@ plotH = 270;
 plotWsel = 1000;
 plotHall = 400;
 plotHMae = 700;
-plotHallCoverages = 500;
+plotHallCoverages = 550;
 plotRatioAllCoverages = 1.8;
 plotWallCoverages= plotRatioAllCoverages*plotHallCoverages;
