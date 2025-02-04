@@ -4,7 +4,7 @@
 %              through all combinations of data-generating processes (DGPs) 
 %              and sample sizes. Simulation results are saved in .mat files 
 %              specific to each DGP and (N, T) combination.
-%
+% ===========================================================
 % Project Name: Inference on Extreme Quantiles of Unobserved
 %               Individual Heterogeneity
 % Developed by: Vladislav Morozov
