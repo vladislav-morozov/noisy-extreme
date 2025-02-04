@@ -1,0 +1,204 @@
+% ===========================================================
+% File: chooseLinePlotsMethodsComparison.m
+% Description: This script creates defines the line plots exported for
+%              comparing different confidence intervals
+% ===========================================================
+%
+% Project Name: Inference on Extreme Quantiles of Unobserved 
+%               Individual Heterogeneity
+% Developed by: Vladislav Morozov
+%
+% This script describes the various 1-dimensional line plots. Plot
+% descriptions are saved in the cell array linePlots.
+%
+% Each plot is described by a struct with the following fields:
+% - yLim (vector): 
+%       Limits for the y-axis.
+% - yLabel (string): 
+%       Label for the y-axis.
+% - computeData (function handle): 
+%       Function for processing the data to be plotted.
+% - plotCallLine (string): 
+%       Command for generating the line plot. This should be a prebaked 
+%       plotting command that will be evaluated using eval().
+% - plotCallMarker (string): 
+%       Command for generating the marker plot. This should also be a  
+%       prebaked plotting command evaluated with eval().
+% - plotCallLegend (string): 
+%       Command for generating the legend plot. This is a small line plot  
+%       that ensures the markers and the line are consistently reflected in
+%       the legend.
+% - plotType (string): 
+%       Type of the plot, used to generate file names.
+% - firstMethodID (integer): 
+%       ID of the first method to be plotted.
+% - yLine (numeric or empty): 
+%       Value at which to add a horizontal reference line, if applicable.
+% - plotLegend (Boolean): 
+%       Whether to include a legend.
+% - legendPosition (vector): 
+%       Position of the legend in the plot.
+% - spacingExponentY (numeric): 
+%       Exponent for nonlinearly transforming the Y-axis.
+% - yTicks (vector): 
+%       Custom tick marks for the Y-axis.
+% - suptitle (string): 
+%       Title for the overall plot.
+% ===========================================================
+
+%% Plot 1: Coverages
+
+% Limits for y axis
+linePlots{1}.yLim = [0, 1];
+% Label for y axis
+linePlots{1}.yLabel = 'Coverage';
+% Method for processing data to plot
+linePlots{1}.computeData = ...
+    @(resultsArray, methodID) ...
+        smoothdata(...
+        computeCoverageLengthNonNaN(resultsArray, methodID, 'coverage'), ...
+        "gaussian", 10);
+% Line plot call
+linePlots{1}.plotCallLine = ['linePlot = plot(spacing, currentData', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Marker plot call
+linePlots{1}.plotCallMarker = ['markerPlot = plot(spacingMarker, currentDataMarker', ...
+    ', "LineStyle", "none"' ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Legend plot call
+linePlots{1}.plotCallLegend = ['legendPlot = plot(-0.001, 0', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Type of the plot, used to to generate file name
+linePlots{1}.plotType = 'coverage';
+% ID of first method to plotted
+linePlots{1}.firstMethodID = 1;
+% Whether to add a horizontal line and at which level
+linePlots{1}.yLine = 1-alphaCI;
+% Whether to add legend
+linePlots{1}.plotLegend = true;
+% Legend position
+linePlots{1}.legendPosition = [0.726, 0.112, 0.1, 0.04];
+% Exponent for nonlinearly transforming Y axis
+linePlots{1}.spacingExponentY = 2.7;
+% Whether special ticks for the Y axis should be used and which
+linePlots{1}.yTicks = [0, 0.5:0.1:0.9, 1-alphaCI, 1];
+% Suptitle for the overall plot
+linePlots{1}.suptitle = '\textbf{Coverage of a 95\% Confidence Interval, by Target Quantile}';
+
+
+%% Plot 2: Lengths
+
+% Limits for y axis
+linePlots{2}.yLim = [];
+% Label for y axis
+linePlots{2}.yLabel = 'Interval length';
+% Method for processing data to plot
+linePlots{2}.computeData = ...
+    @(resultsArray, methodID) ...
+        smoothdata(...
+        computeCoverageLengthNonNaN(resultsArray, methodID, 'length'), ...
+        "gaussian", 10);
+% Line plot call
+linePlots{2}.plotCallLine = ['linePlot = semilogy(spacing, currentData', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Marker plot call
+linePlots{2}.plotCallMarker = ['markerPlot = semilogy(spacingMarker, currentDataMarker', ...
+    ', "LineStyle", "none"' ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Legend plot call 
+linePlots{2}.plotCallLegend = ['legendPlot = semilogy(-0.001, 0', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Type of the plot, used to to generate file name
+linePlots{2}.plotType = 'length';
+% ID of first method to plotted
+linePlots{2}.firstMethodID = 1;  
+% Whether to add a horizontal line and at which level
+linePlots{2}.yLine = [];
+% Whether to add legend
+linePlots{2}.plotLegend = true;
+% Legend position
+linePlots{2}.legendPosition = linePlots{1}.legendPosition;
+% Exponent for nonlinearly transforming Y axis
+linePlots{2}.spacingExponentY = 1;
+% Whether special ticks for the Y axis should be used and which
+linePlots{2}.yTicks = [0.1, 1, 10, 100, 1000, 5000];
+% Suptitle for the overall plot
+linePlots{2}.suptitle = '\textbf{Length of a 95\% Confidence Interval, by Target Quantile}';
+
+ 
+%% Plot 3: relative MAE of adjusted estimator  
+
+% Limits for y axis
+linePlots{3}.yLim = [0, 1.25];
+% Label for y axis
+linePlots{3}.yLabel = 'Relative MSE';
+% Method for processing data to plot
+linePlots{3}.computeData = ...
+    @(resultsArray, methodID) ...
+        smoothdata(nanmean(abs(resultsArray{methodID}.estError).^2)./...
+            nanmean(abs(resultsArray{1}.estError).^2), ...
+             "gaussian", 10);
+
+% Line plot call
+linePlots{3}.plotCallLine = ['linePlot = plot(spacing, currentData', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Marker plot call
+linePlots{3}.plotCallMarker = ['markerPlot = plot(spacingMarker, currentDataMarker', ...
+    ', "LineStyle", "none"' ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Legend plot call
+linePlots{3}.plotCallLegend = ['legendPlot = plot(-0.001, 0', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Type of the plot, used to to generate file name
+linePlots{3}.plotType = 'estError';
+% ID of first method to plotted
+linePlots{3}.firstMethodID = 2;  
+% Whether to add a horizontal line and at which level
+linePlots{3}.yLine = 1; 
+% Whether to add legend
+linePlots{3}.plotLegend = true;
+% Legend position
+linePlots{3}.legendPosition = linePlots{1}.legendPosition;
+% Exponent for nonlinearly transforming Y axis
+linePlots{3}.spacingExponentY = 1;
+% Whether special ticks for the Y axis should be used and which
+linePlots{3}.yTicks = [0:0.5:1, 1.25];
+% Suptitle for the overall plot
+linePlots{3}.suptitle = '\textbf{Efficiency of Corrected Estimators Relative to Sample Quantile, by Target Quantile}';
+
