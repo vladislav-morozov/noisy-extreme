@@ -1,6 +1,6 @@
 % ===========================================================
 % File: chooseLinePlotsMethodsComparison.m
-% Description: This script creates defines the line plots exported for
+% Description: This script defines the line plots exported for
 %              comparing different confidence intervals
 % ===========================================================
 %
