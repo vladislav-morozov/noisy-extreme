@@ -35,9 +35,7 @@
 % - yLine (numeric or empty): 
 %       Value at which to add a horizontal reference line, if applicable.
 % - plotLegend (Boolean): 
-%       Whether to include a legend.
-% - legendPosition (vector): 
-%       Position of the legend in the plot.
+%       Whether to include a legend. 
 % - spacingExponentY (numeric): 
 %       Exponent for nonlinearly transforming the Y-axis.
 % - yTicks (vector): 
@@ -88,14 +86,12 @@ linePlots{1}.firstMethodID = 1;
 linePlots{1}.yLine = 1-alphaCI;
 % Whether to add legend
 linePlots{1}.plotLegend = true;
-% Legend position
-linePlots{1}.legendPosition = [0.726, 0.112, 0.1, 0.04];
 % Exponent for nonlinearly transforming Y axis
 linePlots{1}.spacingExponentY = 2.7;
 % Whether special ticks for the Y axis should be used and which
 linePlots{1}.yTicks = [0, 0.5:0.1:0.9, 1-alphaCI, 1];
 % Suptitle for the overall plot
-linePlots{1}.suptitle = '\textbf{Coverage of a 95\% Confidence Interval, by Target Quantile}';
+linePlots{1}.suptitle = '\textbf{Coverage, by Target Quantile}';
 
 
 %% Plot 2: Lengths
@@ -139,15 +135,13 @@ linePlots{2}.firstMethodID = 1;
 % Whether to add a horizontal line and at which level
 linePlots{2}.yLine = [];
 % Whether to add legend
-linePlots{2}.plotLegend = true;
-% Legend position
-linePlots{2}.legendPosition = linePlots{1}.legendPosition;
+linePlots{2}.plotLegend = true; 
 % Exponent for nonlinearly transforming Y axis
 linePlots{2}.spacingExponentY = 1;
 % Whether special ticks for the Y axis should be used and which
 linePlots{2}.yTicks = [0.1, 1, 10, 100, 1000, 5000];
 % Suptitle for the overall plot
-linePlots{2}.suptitle = '\textbf{Length of a 95\% Confidence Interval, by Target Quantile}';
+linePlots{2}.suptitle = '\textbf{Length, by Target Quantile}';
 
  
 %% Plot 3: relative MAE of adjusted estimator  
@@ -192,13 +186,11 @@ linePlots{3}.firstMethodID = 2;
 % Whether to add a horizontal line and at which level
 linePlots{3}.yLine = 1; 
 % Whether to add legend
-linePlots{3}.plotLegend = true;
-% Legend position
-linePlots{3}.legendPosition = linePlots{1}.legendPosition;
+linePlots{3}.plotLegend = true; 
 % Exponent for nonlinearly transforming Y axis
 linePlots{3}.spacingExponentY = 1;
 % Whether special ticks for the Y axis should be used and which
 linePlots{3}.yTicks = [0:0.5:1, 1.25];
 % Suptitle for the overall plot
-linePlots{3}.suptitle = '\textbf{Efficiency of Corrected Estimators Relative to Sample Quantile, by Target Quantile}';
+linePlots{3}.suptitle = '\textbf{Efficiency of Corrected Estimators Relative to Sample Quantile \hspace{ 3cm} }';
 
