@@ -24,13 +24,3 @@ markerStep = 4;             % Step size for adding markers
 % X-axis parameters
 spacingExponent= 1.2;       % Exponent for x-axis logarithmic scaling
 spacingStep = 10;           % Step size for x-axis ticks
-
-% Dimension parameters
-plotW = 800;
-plotH = 270;
-plotWsel = 1000;
-plotHall = 400;
-plotHMae = 700;
-plotHallCoverages = 550;
-plotRatioAllCoverages = 1.8;
-plotWallCoverages= plotRatioAllCoverages*plotHallCoverages;

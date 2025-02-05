@@ -46,6 +46,8 @@ plotSet{1}.maxPlotDGP_ID =  height(samplerTable);
 plotSet{1}.margH = [.07 .145];
 plotSet{1}.legendFontSize = 6.5;
 plotSet{1}.legendPosition = [0.814, 0.912, 0.1, 0.04];
+plotSet{1}.plotH = 550;
+plotSet{1}.plotW = 1.8*plotSet{1}.plotH; 
 
 %% Plots for the main text
 
@@ -59,3 +61,5 @@ plotSet{2}.maxPlotDGP_ID =  8;
 plotSet{2}.margH = [.07 .105];
 plotSet{2}.legendFontSize = 9;
 plotSet{2}.legendPosition = [0.7875, 0.1355, 0.1, 0.04];
+plotSet{2}.plotH = 550;
+plotSet{2}.plotW = 1.8*plotSet{1}.plotH; 
