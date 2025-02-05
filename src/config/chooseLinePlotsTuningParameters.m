@@ -1,0 +1,144 @@
+% ===========================================================
+% File: chooseLinePlotsTuningParameters.m
+% Description: This script defines the line plots exported for
+%              comparing CIs with different tuning parameters
+% ===========================================================
+%
+% Project Name: Inference on Extreme Quantiles of Unobserved 
+%               Individual Heterogeneity
+% Developed by: Vladislav Morozov
+%
+% This script describes the various 1-dimensional line plots. Plot
+% descriptions are saved in the cell array linePlots.
+%
+% Each plot is described by a struct with the following fields:
+% - yLim (vector): 
+%       Limits for the y-axis.
+% - yLabel (string): 
+%       Label for the y-axis.
+% - computeData (function handle): 
+%       Function for processing the data to be plotted.
+% - plotCallLine (string): 
+%       Command for generating the line plot. This should be a prebaked 
+%       plotting command that will be evaluated using eval().
+% - plotCallMarker (string): 
+%       Command for generating the marker plot. This should also be a  
+%       prebaked plotting command evaluated with eval().
+% - plotCallLegend (string): 
+%       Command for generating the legend plot. This is a small line plot  
+%       that ensures the markers and the line are consistently reflected in
+%       the legend.
+% - plotType (string): 
+%       Type of the plot, used to generate file names.
+% - firstMethodID (integer): 
+%       ID of the first method to be plotted.
+% - yLine (numeric or empty): 
+%       Value at which to add a horizontal reference line, if applicable.
+% - plotLegend (Boolean): 
+%       Whether to include a legend. 
+% - spacingExponentY (numeric): 
+%       Exponent for nonlinearly transforming the Y-axis.
+% - yTicks (vector): 
+%       Custom tick marks for the Y-axis.
+% - suptitle (string): 
+%       Title for the overall plot.
+% ===========================================================
+
+%% Plot 1: Coverages
+
+% Limits for y axis
+linePlots{1}.yLim = [0, 1];
+% Label for y axis
+linePlots{1}.yLabel = 'Coverage';
+% Method for processing data to plot
+linePlots{1}.computeData = ...
+    @(resultsArray, methodID) ...
+        smoothdata(...
+        computeCoverageLengthNonNaN(resultsArray, methodID, 'coverage'), ...
+        "gaussian", 10);
+% Line plot call
+linePlots{1}.plotCallLine = ['linePlot = plot(spacing, currentData', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Marker plot call
+linePlots{1}.plotCallMarker = ['markerPlot = plot(spacingMarker, currentDataMarker', ...
+    ', "LineStyle", "none"' ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Legend plot call
+linePlots{1}.plotCallLegend = ['legendPlot = plot(-0.001, 0', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Type of the plot, used to to generate file name
+linePlots{1}.plotType = 'coverage';
+% ID of first method to plotted
+linePlots{1}.firstMethodID = 1;
+% Whether to add a horizontal line and at which level
+linePlots{1}.yLine = 1-alphaCI;
+% Whether to add legend
+linePlots{1}.plotLegend = true;
+% Exponent for nonlinearly transforming Y axis
+linePlots{1}.spacingExponentY = 2.7;
+% Whether special ticks for the Y axis should be used and which
+linePlots{1}.yTicks = [0, 0.5:0.1:0.9, 1-alphaCI, 1];
+% Suptitle for the overall plot
+linePlots{1}.suptitle = '\textbf{Coverage, by Target Quantile}';
+
+
+%% Plot 2: Lengths
+
+% Limits for y axis
+linePlots{2}.yLim = [];
+% Label for y axis
+linePlots{2}.yLabel = 'Interval length';
+% Method for processing data to plot
+linePlots{2}.computeData = ...
+    @(resultsArray, methodID) ...
+        smoothdata(...
+        computeCoverageLengthNonNaN(resultsArray, methodID, 'length'), ...
+        "gaussian", 10);
+% Line plot call
+linePlots{2}.plotCallLine = ['linePlot = semilogy(spacing, currentData', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Marker plot call
+linePlots{2}.plotCallMarker = ['markerPlot = semilogy(spacingMarker, currentDataMarker', ...
+    ', "LineStyle", "none"' ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Legend plot call 
+linePlots{2}.plotCallLegend = ['legendPlot = semilogy(-0.001, 0', ...
+    ', methodsCI{methodID}.plottingLineStyle', ...
+    ', "Marker", methodsCI{methodID}.plottingMarker', ...
+    ', "MarkerSize", methodsCI{methodID}.plottingMarkerSize', ...
+    ', "LineWidth", plotLineThickness', ...
+    ', "Color", methodsCI{methodID}.(colorField)', ...
+    ', "DisplayName", methodsCI{methodID}.legendName);'];
+% Type of the plot, used to to generate file name
+linePlots{2}.plotType = 'length';
+% ID of first method to plotted
+linePlots{2}.firstMethodID = 1;  
+% Whether to add a horizontal line and at which level
+linePlots{2}.yLine = [];
+% Whether to add legend
+linePlots{2}.plotLegend = true; 
+% Exponent for nonlinearly transforming Y axis
+linePlots{2}.spacingExponentY = 1;
+% Whether special ticks for the Y axis should be used and which
+linePlots{2}.yTicks = [0.1, 1, 10, 100, 1000, 5000];
+% Suptitle for the overall plot
+linePlots{2}.suptitle = '\textbf{Length, by Target Quantile}';
