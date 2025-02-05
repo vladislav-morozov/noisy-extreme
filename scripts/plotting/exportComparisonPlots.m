@@ -23,17 +23,25 @@
 
 % ===========================================================
 
+% --- Plot configuration ---
 
-% Load in plot configurations
-setPlottingParameters                   % general plotting parameters
-chooseLinePlotsMethodsComparison        % line plot types
-choosePlotSetsMethodsComparison         % plot sets to export
- 
-% --- Plot generation ---
- 
 % Zip together distribution samplers in the format (thetaSampler, uSampler)
 samplerTable = combinations(thetaDistrsArray, uDistrsArray);
 
+% Load in plot configurations
+setPlottingParameters                   % general plotting parameters
+
+if plotContext == "methods"
+    chooseLinePlotsMethodsComparison        % line plot types
+    choosePlotSetsMethodsComparison         % plot sets to export
+elseif plotContext == "tuningParameter"
+    chooseLinePlotsTuningParameters         % line plot types
+    choosePlotSetsTuningParameters           % plot sets to export    
+end
+
+
+% --- Plot generation ---
+ 
 % Loop through sets 
 for plotSetID = 1 : length(plotSet)
     % Extract vectors of (N, T)
@@ -54,16 +62,8 @@ for plotSetID = 1 : length(plotSet)
         for plotDGP_ID = plotSet{plotSetID}.minPlotDGP_ID :  plotSet{plotSetID}.maxPlotDGP_ID
 
             % Create figure
-            if plotQuietly ~= 1
-                figure('Renderer', 'painters', ...
-                    'Position', [50 50 plotWallCoverages plotHallCoverages]);
-            else
-                figure('visible','off',...
-                    'Renderer', 'painters',...
-                    'Position', [50 50 plotWallCoverages plotHallCoverages]);
-            end
-
-
+            figure('Renderer', 'painters', ...
+                'Position', [50 50 plotSet{plotSetID}.plotW plotSet{plotSetID}.plotH]);
 
             % Use tight_subplots
             [has, ~] = tight_subplot(numN, numT,[.07 .036], ...
@@ -87,12 +87,19 @@ for plotSetID = 1 : length(plotSet)
                     % Load in corresponding simulation result file
                     fileName = makeOutputFileName(thetaSampler, uSampler, ...
                         N, T, ...
-                        numSamples, simContext);
+                        numSamples, plotContext);
                     load(fileName)
+                    disp(fileName)
+                    disp(length(methodsCI))
 
-                    % ------------- Patches
+                    % Patches
                     % Patch colors if these have been changed after creation
-                    setConfidenceIntervalMethods_CompareIntervals
+                    switch plotContext
+                        case "methods"
+                            setConfidenceIntervalMethods_CompareIntervals
+                        case "tuningParameter"
+                            setConfidenceIntervalMethods_ExtremeTuningParameters
+                    end
 
                     % Patch incorrect name on Gbeta
                     if uSampler.distrLegendName == "G_{\kappa}"
@@ -209,7 +216,7 @@ for plotSetID = 1 : length(plotSet)
             % Create figure saving name
             figureSavingName =   "results/figures/" + ...
                 plotSet{plotSetID}.colorField + "_" + ...
-                simContext + "_" + ...
+                plotContext + "_" + ...
                 linePlots{plotID}.plotType + "_" + ...
                 thetaSampler.distrMachineName + "_" + ...
                 uSampler.distrMachineName;
