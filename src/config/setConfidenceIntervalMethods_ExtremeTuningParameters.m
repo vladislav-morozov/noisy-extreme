@@ -40,8 +40,8 @@ for qID = 1:length(qCandidates)
     qProgressFraction = (qID - 1) / (length(qCandidates) - 1);
 
     % Define color by interpolating between shades of blue
-    subsamplingColor = (qProgressFraction * [119, 155, 255] + ...
-                       (1 - qProgressFraction) * [0, 68, 254])/255;
+    subsamplingColor = (qProgressFraction * [191,255,253] + ...
+                       (1 - qProgressFraction) * [0, 0, 254])/255;
     subsamplingColorBW = (qProgressFraction * [0, 0, 0] + ...
                        (1 - qProgressFraction) * [200, 200, 200])/255;
     subsamplingLine = '-';
@@ -66,8 +66,8 @@ for qID = 1:length(qCandidates)
 
     % Define color by interpolating between darker and lighter shades of
     % orange
-    simColor = (qProgressFraction * [190, 166, 96] + ...
-               (1 - qProgressFraction) * [244, 184, 11])/255;
+    simColor = (qProgressFraction * [255,122,89] + ...
+               (1 - qProgressFraction) * [130,124,96])/255;
     simColorBW = (qProgressFraction * [0, 0, 0] + ...
                        (1 - qProgressFraction) * [200, 200, 200])/255;
     simLine = '--';
