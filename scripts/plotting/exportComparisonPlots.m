@@ -89,9 +89,7 @@ for plotSetID = 1 : length(plotSet)
                     fileName = makeOutputFileName(thetaSampler, uSampler, ...
                         N, T, ...
                         numSamples, plotContext);
-                    load(fileName)
-                    disp(fileName)
-                    disp(length(methodsCI))
+                    load(fileName) 
 
                     % Patches
                     % Patch colors if these have been changed after creation
@@ -221,8 +219,6 @@ for plotSetID = 1 : length(plotSet)
                 linePlots{plotID}.plotType + "_" + ...
                 thetaSampler.distrMachineName + "_" + ...
                 uSampler.distrMachineName;
-
-
 
             % Export as PNG
             set(gcf, 'PaperPosition', [0 0 plotRatioAllCoverages*8 8])
