@@ -29,16 +29,17 @@
 samplerTable = combinations(thetaDistrsArray, uDistrsArray);
 
 % Load in plot configurations
-setPlottingParameters                   % general plotting parameters
+setPlottingParameters                       % general plotting parameters
+
+clear("linePlots", "plotSet")
 
 if plotContext == "methods"
     chooseLinePlotsMethodsComparison        % line plot types
     choosePlotSetsMethodsComparison         % plot sets to export
 elseif plotContext == "tuningParameter"
     chooseLinePlotsTuningParameters         % line plot types
-    choosePlotSetsTuningParameters           % plot sets to export    
+    choosePlotSetsTuningParameters          % plot sets to export    
 end
-
 
 % --- Plot generation ---
  
