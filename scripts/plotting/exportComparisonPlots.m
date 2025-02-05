@@ -24,35 +24,11 @@
 % ===========================================================
 
 
-%% Load in common tuning parameters
-
-setPlottingParameters
-chooseLinePlotsMethodsComparison
+% Load in plot configurations
+setPlottingParameters                   % general plotting parameters
+chooseLinePlotsMethodsComparison        % line plot types
+choosePlotSetsMethodsComparison         % plot sets to export
  
- 
-
-plotSet{1}.destination = "OA";
-plotSet{1}.colorField = 'plottingColor';
-plotSet{1}.NsPlot = Ns;
-plotSet{1}.TsPlot = Ts;
-plotSet{1}.maxPlotID = length(linePlots);
-plotSet{1}.minPlotDGP_ID =  1;
-plotSet{1}.maxPlotDGP_ID =  height(samplerTable);
-plotSet{1}.margH = [.07 .145];
-plotSet{1}.legendFontSize = 6.5;
-plotSet{1}.legendPosition = [0.814, 0.912, 0.1, 0.04];
-
-plotSet{2}.destination = "main";
-plotSet{2}.colorField = 'plottingColorBW';
-plotSet{2}.NsPlot = [Ns(1), Ns(2)];
-plotSet{2}.TsPlot = [Ts(1), Ts(end)];
-plotSet{2}.maxPlotID = 2;
-plotSet{2}.minPlotDGP_ID =  7;
-plotSet{2}.maxPlotDGP_ID =  8;
-plotSet{2}.margH = [.07 .105];
-plotSet{2}.legendFontSize = 9;
-plotSet{2}.legendPosition = [0.7875, 0.1355, 0.1, 0.04];
-
 % --- Plot generation ---
  
 % Zip together distribution samplers in the format (thetaSampler, uSampler)
