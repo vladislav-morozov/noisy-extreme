@@ -73,7 +73,7 @@ subsamplingFixedDenomColor = [0, 0, 255]/255;
 subsamplingFixedDenomColorBW = [50, 50, 50]/255;  
 subsamplingFixedDenomLine = '-';
 subsamplingFixedDenomMarker = 'x';
-subsamplingFixedDenomMarkerSize = 4;
+subsamplingFixedDenomMarkerSize = 7;
 
 % Instantiate
 methodArrayExtremeSubsampFixedQ = ...
@@ -120,7 +120,7 @@ subsamplingFixedDenomSimColor = [1, 135, 232]/255;
 subsamplingFixedDenomSimColorBW = [1, 1, 1]/255; 
 subsamplingFixedDenomSimLine = '-';
 subsamplingFixedDenomSimMarker = 'o';
-subsamplingFixedDenomSimMarkerSize = 4;
+subsamplingFixedDenomSimMarkerSize = 7;
 
 % Instantiate
 methodArrayExtremeSimFixedQ = ...
