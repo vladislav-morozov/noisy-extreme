@@ -10,7 +10,12 @@
 %               Individual Heterogeneity
 % Author: Vladislav Morozov
 %
-% Plot creation is 
+% This script exports the following groups of plots:
+%   1. Main text simulation plots on comparison of different CIs (BW).
+%   2. Online Appendix (OA) plots on comparison of different CIs (color).
+%   3. OA plots on impact of tuning parameters in feasible EVT
+%      approximations (color).
+%   4. OA plots on corrected quantile estimators (color). 
 %
 % Created figures are saved in the 'results/figures/' folder.
 %
@@ -60,13 +65,13 @@ for plotSetID = 1 : length(plotSet)
     % Loop through DGPs, plots and interval sets
     for plotID = 1 : plotSet{plotSetID}.maxPlotID
         for intervalSetID = 1 : length(plotSet{plotSetID}.intervalSets)
-
-
-            for plotDGP_ID = plotSet{plotSetID}.minPlotDGP_ID :  plotSet{plotSetID}.maxPlotDGP_ID
+            for plotDGP_ID = plotSet{plotSetID}.minPlotDGP_ID : ...
+                    plotSet{plotSetID}.maxPlotDGP_ID
 
                 % Create figure
                 figure('Renderer', 'painters', ...
-                    'Position', [50 50 plotSet{plotSetID}.plotW plotSet{plotSetID}.plotH]);
+                    'Position', [50 50 ...
+                    plotSet{plotSetID}.plotW plotSet{plotSetID}.plotH]);
 
                 % Use tight_subplots
                 [has, ~] = tight_subplot(numN, numT,[.07 .036], ...
@@ -88,7 +93,8 @@ for plotSetID = 1 : length(plotSet)
                         uSampler = samplerTable{plotDGP_ID, 2}{1};
 
                         % Load in corresponding simulation result file
-                        fileName = makeOutputFileName(thetaSampler, uSampler, ...
+                        fileName = makeOutputFileName(...
+                            thetaSampler, uSampler, ...
                             N, T, ...
                             numSamples, plotContext);
                         load(fileName)
@@ -119,8 +125,8 @@ for plotSetID = 1 : length(plotSet)
                               plotSet{plotSetID}.intervalSets{intervalSetID}.firstID) ...
                                 :min(numMethods, ...
                                  plotSet{plotSetID}.intervalSets{intervalSetID}.lastID)
-                            % Compute data to plot
 
+                            % Compute data to plot
                             currentData = linePlots{plotID}.computeData(resultsArray, methodID);
 
                             % Change spacing
@@ -153,40 +159,45 @@ for plotSetID = 1 : length(plotSet)
                         % Add x-tick labels and axis label only on the bottom plots
                         if TID == numN
                             xlabel('Quantile')
-                            xticklabels([targetQuantilesDGP(1:spacingStep:end), targetQuantilesDGP(end)])
+                            xticklabels([targetQuantilesDGP(1:spacingStep:end), ...
+                                targetQuantilesDGP(end)])
                         end
 
                         % y-axis: change y limits according to the plot
                         if ~isempty(linePlots{plotID}.yLim)
-                            ylim(linePlots{plotID}.yLim.^ linePlots{plotID}.spacingExponentY);
+                            ylim(linePlots{plotID}.yLim.^...
+                                inePlots{plotID}.spacingExponentY);
                         end
 
                         % y-axis: add y-line if one is requested
                         if ~isempty(linePlots{plotID}.yLine)
-                            hV = yline(linePlots{plotID}.yLine.^ linePlots{plotID}.spacingExponentY);
+                            hV = yline(linePlots{plotID}.yLine.^...
+                                linePlots{plotID}.spacingExponentY);
                             hV.HandleVisibility='off';
                         end
-
+                        
+                        % y-axis: adjust ticks
                         if ~isempty(linePlots{plotID}.yTicks)
-                            yticks(linePlots{plotID}.yTicks.^linePlots{plotID}.spacingExponentY)
+                            yticks(linePlots{plotID}.yTicks.^...
+                                linePlots{plotID}.spacingExponentY)
                         end
+
                         % y label and ticks only on the left plots
                         if NID == 1
                             ylabel(linePlots{plotID}.yLabel)
 
-                            %
+                            % Add tick labels depending on supplied values
                             if isempty(linePlots{plotID}.yTicks)
                                 yticklabels(defaultYTicks)
-
                             else
-
                                 yticklabels( linePlots{plotID}.yTicks)
                             end
 
                         end
 
                         % Add a title to the subplot and left-justify it
-                        ttl = title("N="+num2str(NsPlot(TID))+", T="+num2str(TsPlot(NID)));
+                        ttl = title("N="+num2str(NsPlot(TID))+...
+                            ", T="+num2str(TsPlot(NID)));
                         ttl.Units = 'Normalize';
                         ttl.Position(1) = 0;
                         ttl.HorizontalAlignment = 'left';
@@ -203,7 +214,6 @@ for plotSetID = 1 : length(plotSet)
                                     plotSet{plotSetID}.legendFontSize,'points')
                             end
                         end
-
                     end
                 end
 
