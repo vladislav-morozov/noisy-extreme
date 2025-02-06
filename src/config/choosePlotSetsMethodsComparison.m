@@ -32,7 +32,16 @@
 %       Font size in legend.
 % - legendPosition (vector):
 %       Position of legend.
+% - intervalSets (arrays):
+%       Blocks of intervals to plot
 % ===========================================================
+
+%% Create interval set
+% All methods comparison plotsets plot the full range of intervals
+
+commonSet.firstID = 1;
+commonSet.lastID = inf;
+commonSet.name = "";
 
 %% Plots for the Online Appendix
 
@@ -48,6 +57,8 @@ plotSet{1}.legendFontSize = 6.5;
 plotSet{1}.legendPosition = [0.814, 0.912, 0.1, 0.04];
 plotSet{1}.plotH = 550;
 plotSet{1}.plotW = 1.8*plotSet{1}.plotH; 
+plotSet{1}.intervalSets = {commonSet};
+
 
 %% Plots for the main text
 
@@ -63,3 +74,4 @@ plotSet{2}.legendFontSize = 9;
 plotSet{2}.legendPosition = [0.7875, 0.1355, 0.1, 0.04];
 plotSet{2}.plotH = 550;
 plotSet{2}.plotW = 1.8*plotSet{1}.plotH; 
+plotSet{2}.intervalSets = {commonSet};
