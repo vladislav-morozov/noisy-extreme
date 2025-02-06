@@ -26,7 +26,7 @@ clear thetaSampler* uSampler*
 %% Sample sizes
 
 % Values for N
-Ns = [200, 2000, 8000, 16000, 32000];
+Ns = [200, 2000, 8000, 16000, 32000, 64000];
 
 % Values for T. Any value larger than 4 will yield the same results
 Ts = 10;
