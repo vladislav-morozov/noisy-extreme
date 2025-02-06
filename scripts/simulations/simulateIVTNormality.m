@@ -1,3 +1,14 @@
+% ===========================================================
+% File: simulateIVTNormality.m
+% Description: This script runs the simulation loop for evaluatng the
+%              quality of approximation in the feasible IVT. 
+%              Simulation results are saved in .mat files 
+%              specific to each DGP and (N, T) combination.
+% ===========================================================
+% Project Name: Inference on Extreme Quantiles of Unobserved
+%               Individual Heterogeneity
+% Developed by: Vladislav Morozov
+% ===========================================================
 
 %% Define Simulation Parameters
 
@@ -15,7 +26,7 @@ end
 
 
 %% Loop over each DGP combination
-for dgpID = 1:height(dgps)  
+for dgpID = 1 : height(dgps)  
 
     % Extract sample sizes (N, T) for the current DGP
     N = dgps{dgpID, 3};
