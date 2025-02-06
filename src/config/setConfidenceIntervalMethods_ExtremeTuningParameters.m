@@ -40,8 +40,8 @@ for qID = 1:length(qCandidates)
     qProgressFraction = (qID - 1) / (length(qCandidates) - 1);
 
     % Define color by interpolating between shades of blue
-    subsamplingColor = (qProgressFraction * [191,255,253] + ...
-                       (1 - qProgressFraction) * [0, 0, 254])/255;
+    subsamplingColor = (qProgressFraction * [230,255,253] + ...
+                       (1 - qProgressFraction) * [0, 0, 255])/255;
     subsamplingColorBW = (qProgressFraction * [0, 0, 0] + ...
                        (1 - qProgressFraction) * [200, 200, 200])/255;
     subsamplingLine = '-';
