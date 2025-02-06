@@ -24,3 +24,6 @@ markerStep = 4;             % Step size for adding markers
 % X-axis parameters
 spacingExponent= 1.2;       % Exponent for x-axis logarithmic scaling
 spacingStep = 10;           % Step size for x-axis ticks
+
+% IVT Plot parameters
+xValues = -5:0.01:5;        % Grid for values for X to evaluate the KDE at
