@@ -221,7 +221,7 @@ for plotSetID = 1 : length(plotSet)
                 uSampler.distrMachineName;
 
             % Export as PNG
-            set(gcf, 'PaperPosition', [0 0 plotRatioAllCoverages*8 8])
+            set(gcf, 'PaperPosition', [0 0 1.8*8 8])
             print(gcf, figureSavingName, '-dpng', '-r300' );
 
             % Prepare export settings for PDF
