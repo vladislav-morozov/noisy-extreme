@@ -38,15 +38,21 @@ function averageNonNan = ...
 
     % Loop through quantiles
     for quantID = 1:numQuantiles
-        % Identify successful constructions
+        % Identify successful constructions (non-NaN and non-zero)
         constructionSuccess = ...
-            ~isnan(resultsArray{methodID}.ciLength(:, quantID));
+            (~isnan(resultsArray{methodID}.ciLength(:, quantID))).*...
+            (~(resultsArray{methodID}.ciLength(:, quantID)==0));
+        constructionSuccess = logical(constructionSuccess);
 
+        % if sum(constructionSuccess)>0
         % Extract corresponding properties
         nonNaNProperty = ...
             resultsArray{methodID}.(fieldName)(constructionSuccess, quantID);
 
         % Compute average
         averageNonNan(quantID) = mean(nonNaNProperty);
+        % else
+        % averageNonNan(quantID) = NaN;
+        % end
     end
 end
