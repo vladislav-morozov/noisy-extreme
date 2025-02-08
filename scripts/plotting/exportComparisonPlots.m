@@ -166,7 +166,7 @@ for plotSetID = 1 : length(plotSet)
                         % y-axis: change y limits according to the plot
                         if ~isempty(linePlots{plotID}.yLim)
                             ylim(linePlots{plotID}.yLim.^...
-                                inePlots{plotID}.spacingExponentY);
+                                linePlots{plotID}.spacingExponentY);
                         end
 
                         % y-axis: add y-line if one is requested
