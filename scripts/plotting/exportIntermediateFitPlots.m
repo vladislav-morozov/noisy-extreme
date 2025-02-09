@@ -19,30 +19,30 @@
 % --- Plot configuration ---
  
 % Load in plot configurations
-setPlottingParameters                       % general plotting parameters
+setPlottingParameters                       % General plotting parameters
+quantileIDS = [1, 11, 19, 37];              % Indices of quantiles to plot
+dgpsPlot = dgps([1, 2, 4, 6], :);           % Select specific DGPs
+
 
 % --- Plot generation ---
-
 
 % Create figure
 figure('Renderer', 'painters', ...
     'Position', [50 50 800 500]);
 
 % Use tight_subplots
-[has, ~] = tight_subplot(2, 3,[.07 .036], [.07 .135],[.05 .04]);
+[has, ~] = tight_subplot(length(quantileIDS), height(dgpsPlot), [.07 .036], [.07 .135],[.115 .04]);
 
 % Loop through DGP IDs
-for DGP_ID = 1:height(dgps)
-    % Create subplot
-    axes(has(DGP_ID))
+for DGP_ID = 1:height(dgpsPlot)
 
     % Extract samplers 
-    thetaSampler = dgps{DGP_ID, 1}{1};
-    uSampler = dgps{DGP_ID, 2}{1};
+    thetaSampler = dgpsPlot{DGP_ID, 1}{1};
+    uSampler = dgpsPlot{DGP_ID, 2}{1};
 
     % Extract sample sizes
-    N = dgps{DGP_ID, 3};
-    T = dgps{DGP_ID, 4};
+    N = dgpsPlot{DGP_ID, 3};
+    T = dgpsPlot{DGP_ID, 4};
     
     % Load in corresponding simulation result file
     fileName = makeOutputFileName(...
@@ -51,59 +51,103 @@ for DGP_ID = 1:height(dgps)
         numSamples, plotContext);
     load(fileName)
 
-    % Plot the distribution of the statistic
-    kdes = ksdensity(ivtArray(:, 5), xValues);
-    plot(xValues, kdes, ...
-        'LineWidth', plotLineThickness)
+    % Loop through quantile indices
+    for quantPos = 1 : length(quantileIDS)
+        
+        % Create subplot
+        axes(has(DGP_ID + (quantPos-1)*(height(dgpsPlot))))
 
-    % Superimpose normal density
-    hold on
-    plot(xValues, normpdf(xValues), ...
-        'LineWidth', 2, ...
-        'LineStyle','--')
+        % Check if construction of statistic failed
+        if length(unique(ivtArray(:, quantileIDS(quantPos)))) <= 2
+            % If failed, add a dummy plot to set axis limits
+            plot(xValues, 0.45)
+            ylim([0, 0.45])
 
-    % Set y-limits
-    ylim([0, 0.45])
+            % Plot N/A text
+            text('String', '$N/A$', ...
+                'Units', 'normalized', ...
+                'Position', [0.4, 0.5], ...  
+                'HorizontalAlignment', 'left', ...
+                'FontSize', 10);
 
-    % Set tick labels to only appear on the edge subplots
-    if DGP_ID < 4
-        xticklabels([])
+            % Skip further plotting for this (DGP, Quantile) combiation
+            continue
+        end
+
+        % Plot the distribution of the statistic
+        kdes = ksdensity(ivtArray(:, quantileIDS(quantPos)), xValues);
+        plot(xValues, kdes, ...
+            'LineWidth', plotLineThickness)
+
+        % Superimpose normal density
+        hold on
+        plot(xValues, normpdf(xValues), ...
+            'LineWidth', 2, ...
+            'LineStyle','--')
+
+        % Set y-limits
+        ylim([0, 0.45])
+
+        % Set tick labels to only appear on the edge subplots
+        if quantPos ~= length(quantileIDS)
+            xticklabels([])
+        end
+
+        % Add y tick labels only to the leftmost plots
+        if DGP_ID ~= 1
+            yticklabels([])
+        end
+
+        % Add sample sizes to top row
+        if quantPos == 1
+            % Add a title to the subplot and left-justify it
+            ttl = title("N="+num2str(N));
+            ttl.Units = 'Normalize';
+            ttl.Position(1) = 0;
+            ttl.HorizontalAlignment = 'left';
+        end
+
     end
-
-    if rem(DGP_ID, 3) ~= 1
-        yticklabels([])
-    end
-
-    % Add a title to the subplot and left-justify it
-    ttl = title("N="+num2str(N));
-    ttl.Units = 'Normalize';
-    ttl.Position(1) = 0;
-    ttl.HorizontalAlignment = 'left';
-
+    
     % Add legend to the last subplot
-    if DGP_ID == height(dgps)
-        legend('Feasible IVT statistic', 'N(0, 1)', ...
-            'Position', [0.864, 0.905, 0, 0])
+    if DGP_ID == height(dgpsPlot)
+        legend('IVT Statistic', 'N(0, 1)', ...
+            'Position', [0.914, 0.905, 0, 0])
     end
 end
 
 % Add suptitle
 sgtitle("Distribution of Self-Normalized Intermediate Statistic vs. N(0, 1)")
  
+% Add quantile labels to rows
+text('String', '$\tau=0.90$', ...
+     'Units', 'normalized', ...
+     'Position', [-4.15, 4.9], ...  
+     'HorizontalAlignment', 'left', ...
+     'FontSize', 10);
 
-% Create figure saving name
-figureSavingName =   "results/figures/" + ...
-    plotContext + "_" + ...
-    thetaSampler.distrMachineName + "_" + ...
-    uSampler.distrMachineName;
+text('String', '$\tau=0.95$', ...
+     'Units', 'normalized', ...
+     'Position', [-4.15, 3.4], ... 
+     'HorizontalAlignment', 'left', ...
+     'FontSize', 10);
 
-% Export as PNG
-set(gcf, 'PaperPosition', [0 0 1.8*8 8])
-print(gcf, figureSavingName, '-dpng', '-r300' );
+text('String', '$\tau=0.99$', ...
+     'Units', 'normalized', ...
+     'Position', [-4.15, 1.95], ...  
+     'HorizontalAlignment', 'left', ...
+     'FontSize', 10);
+
+text('String', '$\tau=0.999$', ...
+     'Units', 'normalized', ...
+     'Position', [-4.15, 0.45], ...  
+     'HorizontalAlignment', 'left', ...
+     'FontSize', 10);
 
 % Prepare export settings for PDF
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+
 % Export as PDF
 print(gcf, figureSavingName, '-dpdf');
