@@ -43,16 +43,12 @@ function averageNonNan = ...
             (~isnan(resultsArray{methodID}.ciLength(:, quantID))).*...
             (~(resultsArray{methodID}.ciLength(:, quantID)==0));
         constructionSuccess = logical(constructionSuccess);
-
-        % if sum(constructionSuccess)>0
+ 
         % Extract corresponding properties
         nonNaNProperty = ...
             resultsArray{methodID}.(fieldName)(constructionSuccess, quantID);
 
         % Compute average
-        averageNonNan(quantID) = mean(nonNaNProperty);
-        % else
-        % averageNonNan(quantID) = NaN;
-        % end
+        averageNonNan(quantID) = mean(nonNaNProperty); 
     end
 end
