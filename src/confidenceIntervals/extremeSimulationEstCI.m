@@ -42,20 +42,16 @@ function [simExtremeEst, simExtremeInt] = ...
     
     % Compute estimator for gamma
     gammaEst = pwmEstimator(thetaVector, kOpt);
-
     
-    % Compute critical values by simulations
+    % Compute critical values
     critValues = ...
-        gammaRatioLimitQuantiles(gammaEst, denominatorParam, ...
+        gammaRatioLimitQuantiles(gammaEst, numeratorParam,denominatorParam, ...
         (1 - targetQuantiles) * N, [alphaCI / 2, 1 - alphaCI / 2, 1 / 2]);
-    
-    % Compute estimators and intervals
-    numerator = thetaVector(ceil(length(thetaVector) * targetQuantiles));
-    
+
     % Compute estimators and intervals
     if isnumeric(numeratorParam)
         % Use the presupplied r
-        numerator = thetaVector(end - numeratorParam);
+        numerator = thetaVector(end - numeratorParam); 
     else
         % Set r to match the corresponding sample quantile
         numerator = thetaVector(ceil(length(thetaVector) * targetQuantiles));
@@ -81,7 +77,8 @@ end
 
 
 function limitRatioQuantiles = ...
-    gammaRatioLimitQuantiles(gammaEst, denominatorParam, l, quantiles)
+    gammaRatioLimitQuantiles(gammaEst, numeratorParam, denominatorParam, ...
+    l, quantiles)
     % gammaRatioLimitQuantiles Simulates samples from a gamma ratio limit 
     % for feasibly normalized top order statistics.
     %
@@ -92,6 +89,9 @@ function limitRatioQuantiles = ...
     %         target quantiles as in F^{-1}(1-l/N).
     %     quantiles (vector): Vector of required quantiles 
     %         (between 0 and 1).
+    %     numeratorParam (str or int): If "match", numerator uses the
+    %         corresponding sample quantile. If numeric, uses the
+    %         corresponding order statistic.
     %     denominatorParam (string or int): If "sample", the denominator 
     %         uses the corresponding sample quantile. If a positive 
     %         integer, the corresponding order statistic is used.
@@ -118,6 +118,13 @@ function limitRatioQuantiles = ...
             sum(expSample(:, 1:floor(l(targetQuantileID)) + 1), 2);
     end
     
+    if isnumeric(numeratorParam)
+        numeratorSum = sum(expSample(:, 1:(numeratorParam+1)), 2);
+    else
+        numeratorSum = gammaSumL;
+    end
+
+
     % Split depending on value passed for the denominatorParam
     if isnumeric(denominatorParam)
         % Use the presupplied q
@@ -132,10 +139,10 @@ function limitRatioQuantiles = ...
     % expression changes depending on the supplied value of gamma
     if gammaEst ~= 0
         sampleLimitRatio = ...
-            (gammaSumL .^ (-gammaEst) - l .^ (-gammaEst)) ./ ...
+            (numeratorSum .^ (-gammaEst) - l .^ (-gammaEst)) ./ ...
             (denominatorSum .^ (-gammaEst) - gammas1 .^ (-gammaEst));
     else
-        sampleLimitRatio = (-log(gammaSumL) - log(l)) ./ ...
+        sampleLimitRatio = (-log(numeratorSum) - log(l)) ./ ...
             (-log(denominatorSum) + log(gammas1));
     end
     
