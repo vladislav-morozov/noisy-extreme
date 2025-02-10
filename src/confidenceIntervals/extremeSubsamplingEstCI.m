@@ -1,7 +1,7 @@
 function [subsampleExtremeEst, subsampleExtremeInt] = ...
     extremeSubsamplingEstCI(thetaVector, targetQuantiles, alphaCI, ...
-        denominatorParam, subsampleSize, numSubsamples)
-    % EXTREMESUBSAMPLINGESTCI Computes quantile estimators and confidence 
+        numeratorParam, denominatorParam, subsampleSize, numSubsamples)
+    % extremeSubsamplingEstCI Computes quantile estimators and confidence 
     % intervals for quantiles using the feasible extreme value theorem with 
     % subsampled quantiles.
     %
@@ -14,6 +14,9 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
     %     thetaVector (vector): A presorted vector of data.
     %     targetQuantiles (vector): A vector of target quantiles.
     %     alphaCI (float): Significance level for the confidence intervals.
+    %     numeratorParam (str or int): If "match", numerator uses the
+    %         corresponding sample quantile. If numeric, uses the
+    %         corresponding order statistic.
     %     denominatorParam (string or int): If "sample", the denominator 
     %         uses the corresponding sample quantile. If a positive 
     %         integer, the corresponding order statistic is used.
@@ -39,7 +42,8 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
         subsampleSize = floor(subsampleSize);
         [subsampleExtremeEst, subsampleExtremeInt] = ...
             computeSubsampledEstCI(thetaVector, targetQuantiles, ...
-            alphaCI, denominatorParam, subsampleSize, numSubsamples);
+            alphaCI, numeratorParam, denominatorParam, ...
+            subsampleSize, numSubsamples);
     else
         % Run minimum volatility 
         % Allocate intervals
@@ -55,7 +59,8 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
             [estimatesMV(candidateSizeID, :), ...
                 intervalsMV(:, :, candidateSizeID)] = ...
                 computeSubsampledEstCI(thetaVector, targetQuantiles, ...
-                alphaCI, denominatorParam, candidateSize, numSubsamples);
+                alphaCI, numeratorParam, denominatorParam, ...
+                candidateSize, numSubsamples);
         end
         
         % Compute moving variance of interval sizes
@@ -91,14 +96,17 @@ end
 
 function [subsampleExtremeEst, subsampleExtremeInt] = ...
     computeSubsampledEstCI(thetas, targetQuantiles, alphaCI, ...
-    denominatorParam, subsampleSize, numSubsamples)
-    % COMPUTESUBSAMPLEDESTCI Computes median-unbiased estimator and CIs for 
+    numeratorParam, denominatorParam, subsampleSize, numSubsamples)
+    % computeSubsampledEstCI Computes median-unbiased estimator and CIs for 
     % target quantiles using subsampling.
     %
     % Args:
     %     thetas (vector): A presorted vector of data.
     %     targetQuantiles (vector): A vector of target quantiles.
     %     alphaCI (float): Significance level for the confidence intervals.
+    %     numeratorParam (str or int): If "match", numerator uses the
+    %         corresponding sample quantile. If numeric, uses the
+    %         corresponding order statistic.
     %     denominatorParam (string or int): If "sample", uses the
     %         corresponding sample quantile. If a positive integer, the
     %         corresponding order statistic is used.
@@ -114,14 +122,21 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
     % Do subsampling
     subsampledValuesW = ...
         computeSelfNormalizedStatisticSubsamples(thetas, targetQuantiles, ...
-        denominatorParam, subsampleSize, numSubsamples);
+        numeratorParam, denominatorParam, subsampleSize, numSubsamples);
     
     % Extract critical values
     critValues = ...
         quantile(subsampledValuesW, [alphaCI / 2, 1 - alphaCI / 2, 1 / 2]);
     
     % Compute estimators and intervals
-    numerator = thetas(ceil(length(thetas) * targetQuantiles));
+    if isnumeric(numeratorParam)
+        % Use the presupplied r
+        numerator = thetas(end - numeratorParam);
+    else
+        % Set r to match the corresponding sample quantile
+        numerator = thetas(ceil(length(thetas) * targetQuantiles));
+    end 
+    
     if isnumeric(denominatorParam)    
         % Use the presupplied q
         denominator = thetas(end - denominatorParam);
@@ -145,13 +160,16 @@ end
 
 function subsampledValuesW = ...
     computeSelfNormalizedStatisticSubsamples(thetas, targetQuantiles, ...
-        denominatorParam, subsampleSize, numSubsamples)
-    % COMPUTESELFNORMALIZEDSTATISTICSUBSAMPLES Computes the subsampling 
+        numeratorParam, denominatorParam, subsampleSize, numSubsamples)
+    % computeSelfNormalizedStatisticSubsamples Computes the subsampling 
     % statistic W based on data. 
     %
     % Args:
     %     thetas (vector): A presorted vector of data.
     %     targetQuantiles (vector): A vector of target quantiles.
+    %     numeratorParam (str or int): If "match", numerator uses the
+    %         corresponding sample quantile. If numeric, uses the
+    %         corresponding order statistic.
     %     denominatorParam (string or int): If "sample", the denominator 
     %         uses the corresponding sample quantile. If a positive 
     %         integer, the corresponding order statistic is used.
@@ -182,18 +200,28 @@ function subsampledValuesW = ...
         % Draw subsample, sort it, extract
         currentSubsample = thetas(indices(:, subsampleID));
         sampleSorted = sort(currentSubsample);
+
+        % Check how to handle the numerator
+        if isnumeric(numeratorParam)
+            % Presupplied numeric value of r
+            numeratorSubsample = sampleSorted(end-numeratorParam);
+        else
+            % Match r to the target quantile
+            numeratorSubsample = sampleSorted(subsampleSize - ceil(lNum));
+        end
+
         % Check how to handle the denominator
         if isnumeric(denominatorParam)
             % Use the presupplied q
             subsampledValuesW(subsampleID, :) = ...
-                (sampleSorted(subsampleSize - floor(lNum))' - centeringTheta') ./ ...
+                (numeratorSubsample' - centeringTheta') ./ ...
                 (sampleSorted(end - denominatorParam) - sampleSorted(end));
         else
             % Set q to match the corresponding sample quantile, except when
             % it leads to 0 denominator
 
             subsampledValuesW(subsampleID, :) = ...
-                (sampleSorted(subsampleSize - ceil(lNum))' - centeringTheta') ./ ...
+                (numeratorSubsample' - centeringTheta') ./ ...
                 (sampleSorted(subsampleSize - ceil(lDenom))' - sampleSorted(end));
         end
     end

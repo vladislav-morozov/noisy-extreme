@@ -66,7 +66,7 @@ subsamplingQ = 2;
 % Fitting function
 fitExtrFixedQ = @(thetaEsts, targetQuantiles, varEsts, T) ...
     extremeSubsamplingEstCI(thetaEsts, targetQuantiles, alphaCI, ...
-    subsamplingQ, 'MV', numSubsamples);
+    "match", subsamplingQ, 'MV', numSubsamples);
  
 % Plotting parameters
 subsamplingFixedDenomColor = [0, 0, 255]/255;  
@@ -113,7 +113,7 @@ simulatedQ = 4;
 % Fitting function
 fitExtrFixedQSim = @(thetaEsts, targetQuantiles, varEsts, T) ...
     extremeSimulationEstCI(thetaEsts, targetQuantiles, alphaCI, ...
-        simulatedQ, numBootstrapSamples);
+        "match", simulatedQ, numBootstrapSamples);
 
 % Plotting parameters
 subsamplingFixedDenomSimColor = [1, 135, 232]/255; 

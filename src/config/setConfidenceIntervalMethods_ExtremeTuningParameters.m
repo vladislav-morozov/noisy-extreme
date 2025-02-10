@@ -34,7 +34,7 @@ for qID = 1:length(qCandidates)
     % Define subsampling CI function using fixed q value
     fitExtrFixedQ = @(thetaEsts, targetQuantiles, varEsts, T) ...
         extremeSubsamplingEstCI(thetaEsts, targetQuantiles, alphaCI, ...
-        qCandidate, 'MV', numSubsamples);
+        "match", qCandidate, 'MV', numSubsamples);
 
     % Compute interpolation fraction to adjust color smoothly
     qProgressFraction = (qID - 1) / (length(qCandidates) - 1);
@@ -62,7 +62,7 @@ for qID = 1:length(qCandidates)
     % Define simulation-based CI function using fixed q value
     fitExtrFixedQSim = @(thetaEsts, targetQuantiles, varEsts, T) ...
         extremeSimulationEstCI(thetaEsts, targetQuantiles, alphaCI, ...
-            qCandidate, numBootstrapSamples);
+            "match", qCandidate, numBootstrapSamples);
 
     % Define color by interpolating between darker and lighter shades of
     % orange

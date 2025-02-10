@@ -1,6 +1,6 @@
 function [simExtremeEst, simExtremeInt] = ...
     extremeSimulationEstCI(thetaVector, targetQuantiles, alphaCI, ...
-        denominatorParam, numBootstrapSamples)
+        numeratorParam, denominatorParam, numBootstrapSamples)
     % extremeSimulationEstCI Computes quantile estimators and confidence 
     % intervals for quantiles using the feasible extreme value theorem with 
     % simulated critical values.
@@ -14,6 +14,9 @@ function [simExtremeEst, simExtremeInt] = ...
     %     thetaVector (vector): A presorted vector of data.
     %     targetQuantiles (vector): A vector of target quantiles.
     %     alphaCI (float): Significance level for the confidence intervals.
+    %     numeratorParam (str or int): If "match", numerator uses the
+    %         corresponding sample quantile. If numeric, uses the
+    %         corresponding order statistic.
     %     denominatorParam (string or int): If "sample", the denominator 
     %         uses the corresponding sample quantile. If a positive 
     %         integer, the corresponding order statistic is used.
@@ -49,6 +52,15 @@ function [simExtremeEst, simExtremeInt] = ...
     % Compute estimators and intervals
     numerator = thetaVector(ceil(length(thetaVector) * targetQuantiles));
     
+    % Compute estimators and intervals
+    if isnumeric(numeratorParam)
+        % Use the presupplied r
+        numerator = thetaVector(end - numeratorParam);
+    else
+        % Set r to match the corresponding sample quantile
+        numerator = thetaVector(ceil(length(thetaVector) * targetQuantiles));
+    end 
+
     if isnumeric(denominatorParam)
         % Use the presupplied q
         denominator = thetaVector(end - denominatorParam);
