@@ -14,10 +14,21 @@
 
 % Define the range of q values (denominator parameters) to test
 qCandidates = [2:2:9, 10:6:30]; 
+numQCandidates = length(qCandidates);
 
 % Initialize an array to store confidence interval (CI) methods
 % Each q value will have two associated methods (subsampling and simulated)
 methodsCI = cell(2 * length(qCandidates), 1);
+
+% Create a matrix of colors to plot
+colorMat1 = [linspace(1, 0.54, numQCandidates/2); ...
+             linspace(0.64, 0.35, numQCandidates/2); ...
+             linspace(0, 0, numQCandidates/2);   ]';
+colorMat2 = [linspace(0.09, 0, numQCandidates/2); ...
+             linspace(0.69, 0.25, numQCandidates/2); ...
+             linspace(1, 0.8, numQCandidates/2);   ]';
+% First half of colors is drawn from colorMat1, second from colorMat2
+colorMat = flipud([colorMat1; colorMat2]);
 
 %% Instantiate Confidence Interval Methods
 
@@ -27,6 +38,7 @@ for qID = 1:length(qCandidates)
     % Extract current q value from candidates
     qCandidate = qCandidates(qID);
 
+    currentColor = colorMat(qID,:);
     % ------------------
     % Subsampling-Based Method
     % ------------------
@@ -39,9 +51,7 @@ for qID = 1:length(qCandidates)
     % Compute interpolation fraction to adjust color smoothly
     qProgressFraction = (qID - 1) / (length(qCandidates) - 1);
 
-    % Define color by interpolating between shades of blue
-    subsamplingColor = (qProgressFraction * [230,255,253] + ...
-                       (1 - qProgressFraction) * [0, 0, 255])/255;
+    % Set formating aspects
     subsamplingColorBW = (qProgressFraction * [0, 0, 0] + ...
                        (1 - qProgressFraction) * [200, 200, 200])/255;
     subsamplingLine = '-';
@@ -52,7 +62,7 @@ for qID = 1:length(qCandidates)
     methodsCI{qID} = quantileEstimatorConfidenceIntervalArray(fitExtrFixedQ, ...
         "extrSubsamp" + num2str(qCandidate), ...
         "Extreme: subsampling, q=" + num2str(qCandidate), ...
-        subsamplingColor, subsamplingColorBW,  subsamplingLine, ...
+        currentColor, subsamplingColorBW,  subsamplingLine, ...
         subsamplingMarker, subsamplingMarkerSize);
 
     % ------------------
@@ -64,10 +74,7 @@ for qID = 1:length(qCandidates)
         extremeSimulationEstCI(thetaEsts, targetQuantiles, alphaCI, ...
             "match", qCandidate, numBootstrapSamples);
 
-    % Define color by interpolating between darker and lighter shades of
-    % orange
-    simColor = (qProgressFraction * [255,122,89] + ...
-               (1 - qProgressFraction) * [130,124,96])/255;
+    % Set formatting aspects
     simColorBW = (qProgressFraction * [0, 0, 0] + ...
                        (1 - qProgressFraction) * [200, 200, 200])/255;
     simLine = '--';
@@ -79,6 +86,6 @@ for qID = 1:length(qCandidates)
         quantileEstimatorConfidenceIntervalArray(fitExtrFixedQSim, ...
         "extrSim" + num2str(qCandidate), ...
         "Extreme: simulated (PWM), q=" + num2str(qCandidate), ...
-        simColor, simColorBW, simLine, ...
+        currentColor, simColorBW, simLine, ...
         simMarker, simMarkerSize);
 end
