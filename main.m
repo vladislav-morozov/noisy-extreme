@@ -76,7 +76,7 @@ sigmaSqX = 1;          % Variance of x
 rhoTheta = 0.5;        % Correlation between coordinates of theta
 rhoXtheta = 0.5;       % Correlation between x and theta
 
-numSamples = 3334;           % number of replication samples
+numSamples = 10000;           % number of replication samples
 numSubsamples = 5e3;          % number of subsamples   
 numBootstrapSamples = 1e3;    % number of bootstrap samples
 
