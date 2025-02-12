@@ -33,7 +33,7 @@ function [subsampleExtremeEst, subsampleExtremeInt] = ...
     % selecting a range of candidate values and the size of the moving 
     % window. The results are not sensitive to these choices. The following 
     % values are used by default, but they can be replaced with arguments.
-    candidateSizes = floor(linspace( 0.7*N^(4/5), 2*N^(4/5), 20));
+    candidateSizes = floor(linspace( N^(4/5), min(2*N^(9/10), N), 20));
     mvMovingAverageSize = 5;
     
     % Check which version of subsampling to apply
@@ -188,7 +188,7 @@ function subsampledValuesW = ...
     % Extract sample quantiles corresponding to targetQuantiles
     lNum = (1 - targetQuantiles) * N; % constant l of F^{-1}(1-l/N)
     % Correct l used in the denominators to prevent divison by zero
-    lDenom = max(ceil(lNum), 1);
+    lDenom = max(ceil(lNum), 1); 
     centeringTheta = thetas(floor(N - N * lNum / subsampleSize));
     
     % Allocate space for values of subsampled statistic W
@@ -207,7 +207,7 @@ function subsampledValuesW = ...
             numeratorSubsample = sampleSorted(end-numeratorParam);
         else
             % Match r to the target quantile
-            numeratorSubsample = sampleSorted(subsampleSize - ceil(lNum));
+            numeratorSubsample = sampleSorted(subsampleSize - floor(lNum));
         end
 
         % Check how to handle the denominator
