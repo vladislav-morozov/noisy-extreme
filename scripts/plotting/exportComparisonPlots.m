@@ -43,7 +43,10 @@ if plotContext == "methods"
     choosePlotSetsMethodsComparison         % plot sets to export
 elseif plotContext == "tuningParameter"
     chooseLinePlotsTuningParameters         % line plot types
-    choosePlotSetsTuningParameters          % plot sets to export    
+    choosePlotSetsTuningParameters          % plot sets to export   
+elseif plotContext == "numeratorTuningParameter"
+    chooseLinePlotsTuningParameters         % line plot types
+    choosePlotSetsNumeratorTuningParameters % plot sets to export   
 end
 
 % --- Plot generation ---
@@ -106,6 +109,8 @@ for plotSetID = 1 : length(plotSet)
                                 setConfidenceIntervalMethods_CompareIntervals
                             case "tuningParameter"
                                 setConfidenceIntervalMethods_ExtremeTuningParameters
+                            case "numeratorTuningParameter"
+                                setConfidenceIntervalMethods_ExtremeNumeratorParameter
                         end
 
                         % Patch incorrect name on Gbeta
