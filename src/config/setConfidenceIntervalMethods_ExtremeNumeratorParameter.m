@@ -18,11 +18,13 @@ rCandidates = {"match", 0};     % numerator values
 % Each q value will have two associated methods (subsampling and simulated)
 methodsCI = cell(2*length(rCandidates) * length(qCandidates), 1);
 
-% Create list of 4 colors used as CI line colors
+% Create list of colors, markers, and line styles 
 colorMat = [255,165,0;...
             140, 91, 0; ...
             25, 178, 255; ...
             0, 68, 204]/255;
+markerStyles = {"o", "x"};
+lineStyles = {"-", "--"};
  
 %% Instantiate Confidence Interval Methods
 
@@ -52,10 +54,8 @@ for qID = 1 : length(qCandidates)
         % Define color by picking corresponding color from colormat
         subsamplingColor = colorMat(qID + (rID-1)*(length(qCandidates)),:);
         subsamplingColorBW = (qProgressFraction * [0, 0, 0] + ...
-            (1 - qProgressFraction) * [200, 200, 200])/255;
-        subsamplingLine = '-';
-        subsamplingMarker = 'none';
-        subsamplingMarkerSize = 1;
+            (1 - qProgressFraction) * [200, 200, 200])/255; 
+        subsamplingMarkerSize = 6;
 
         % Instantiate the subsampling-based CI method with defined parameters
         methodsCI{qID + (rID-1)*(length(qCandidates))} = ...
@@ -63,8 +63,8 @@ for qID = 1 : length(qCandidates)
             "extrSubsamp" + num2str(qCandidate), ...
             "Extreme: subsampling, q=" + num2str(qCandidate) + ...
             ", r = " + num2str(rCandidate), ...
-            subsamplingColor, subsamplingColorBW,  subsamplingLine, ...
-            subsamplingMarker, subsamplingMarkerSize);
+            subsamplingColor, subsamplingColorBW,  lineStyles{rID}, ...
+            markerStyles{1+mod(qID+rID, 2)}, subsamplingMarkerSize);
 
         % ------------------
         % Simulation-Based Method
@@ -79,7 +79,7 @@ for qID = 1 : length(qCandidates)
             (1 - qProgressFraction) * [200, 200, 200])/255;
         simLine = '--';
         simMarker = 'none';
-        simMarkerSize = 1;
+        simMarkerSize = 6;
 
         % Instantiate the simulation-based CI method with defined parameters
         methodsCI{length(rCandidates) * length(qCandidates) + ...
@@ -88,7 +88,7 @@ for qID = 1 : length(qCandidates)
             "extrSim" + num2str(qCandidate), ...
             "Extreme: simulated (PWM), q=" + num2str(qCandidate) + ...
             ", r = " + num2str(rCandidate), ...
-            subsamplingColor, simColorBW, simLine, ...
-            simMarker, simMarkerSize);
+            subsamplingColor, simColorBW, lineStyles{rID}, ...
+            markerStyles{qID}, simMarkerSize);
     end
 end
