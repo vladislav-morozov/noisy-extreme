@@ -56,9 +56,9 @@ I discuss methods to build confidence intervals for extreme quantiles. These con
 - `src/`: Contains all source code, including custom classes, confidence intervals, distributions, and utility functions.
     - `src/classes/`: Custom classes for confidence intervals, data samplers, and results arrays.
     - `src/confidenceIntervals/`: Implementations of various confidence intervals.
+    - `src/config/`: Configuration files for selecting methods, setting data generating processes, and parameters for simulations and plotting.
     - `src/distributions/`: Data generating process implementations.
     - `src/utilities/`: Various helper functions.
-- `config/`: Configuration files for selecting methods, setting data generating processes, and parameters for simulations and plotting.
 - `scripts/`: Contains executable scripts for running simulations and generating plots.
     - `scripts/simulation/`: Scripts to execute the actual simulations.
     - `scripts/plotting/`: Scripts to generate and export plots.
