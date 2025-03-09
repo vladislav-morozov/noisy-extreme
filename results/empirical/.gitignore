@@ -1,0 +1,5 @@
+# Only figures may be exported due to data restrictions.
+# Hence, ignore everything in this directory
+*
+# Except this gitignore
+!.gitignore
