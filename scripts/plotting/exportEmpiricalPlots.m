@@ -10,11 +10,17 @@
 % Author: Vladislav Morozov
 % ===========================================================
 %
-% This script exports the 
+% This script exports the plots for the empirical application
+% to differences in firm productivity between denser and less
+% dense areas. Two kinds of plots are exported:
+%  1. Plots split by sector and area type. Includes various 
+%     combinations of CIs and visualizes the rule of thumb for
+%     using applications.
+%  2. Plots depicting denser/less denser on the same panel. 
+%     Informative about alignment of tails. Supports mean-
+%     variance adjustments.
 %
 % Created figures are saved in the 'results/figures/' folder.
-%
-% Implementation notes: 
 %  
 % ===========================================================
 
