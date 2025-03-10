@@ -21,14 +21,12 @@
 %% Load configuration parameters
 
 setPlottingParametersEmpirical
- 
-% Quantiles without adjustment
-% One plot per sector
+  
+%% Plots split by AME/BME
 
 % Loop through confidence interval sets
-for ciSetID = 1 : length(ciSets)
-    ciIDsToPlot = ciSets{ciSetID}.ciIDs;
-
+for ciSetID = 1 : length(ciSetsSplit)
+    ciIDsToPlot = ciSetsSplit{ciSetID}.ciIDs;
 
     % Loop through sectors
     for comboID =  1 : numNonDensCombos
@@ -96,7 +94,7 @@ for ciSetID = 1 : length(ciSets)
                 % Extract quantile data
                 quantileData = currentResults.fittedCIs{ciID}.fittedCI;
                 quantileData = smoothdata(quantileData', ...
-                    "gaussian", ciSets{ciSetID}.gaussK)';
+                    "gaussian", ciSetsSplit{ciSetID}.gaussK)';
 
                 % Extract target quantiles
                 currentTargetQuantiles = ...
@@ -123,8 +121,8 @@ for ciSetID = 1 : length(ciSets)
                     % Line plot
                     plot(spacing, tailQuantiles, ...
                         "LineStyle", patchedCI{ciID}.plottingLineStyle, ...
-                        "LineWidth", plotLineThickness, ...
-                        "Color", patchedCI{ciID}.(ciSets{ciSetID}.colorField), ...
+                        "LineWidth", plotLineThicknessSplit, ...
+                        "Color", patchedCI{ciID}.(ciSetsSplit{ciSetID}.colorField), ...
                         'HandleVisibility','off');
                     hold on
 
@@ -134,8 +132,8 @@ for ciSetID = 1 : length(ciSets)
                         "LineStyle", "none", ...
                         "Marker", patchedCI{ciID}.plottingMarker, ...
                         "MarkerSize", patchedCI{ciID}.plottingMarkerSize, ...
-                        "LineWidth", plotLineThickness, ...
-                        "Color", patchedCI{ciID}.(ciSets{ciSetID}.colorField), ...
+                        "LineWidth", plotLineThicknessSplit, ...
+                        "Color", patchedCI{ciID}.(ciSetsSplit{ciSetID}.colorField), ...
                         'HandleVisibility','off');
 
                     % Legend plot
@@ -144,8 +142,8 @@ for ciSetID = 1 : length(ciSets)
                         "LineStyle", patchedCI{ciID}.plottingLineStyle, ...
                         "Marker", patchedCI{ciID}.plottingMarker, ...
                         "MarkerSize", patchedCI{ciID}.plottingMarkerSize, ...
-                        "LineWidth", plotLineThickness, ...
-                        "Color", patchedCI{ciID}.(ciSets{ciSetID}.colorField), ...
+                        "LineWidth", plotLineThicknessSplit, ...
+                        "Color", patchedCI{ciID}.(ciSetsSplit{ciSetID}.colorField), ...
                         "DisplayName", patchedCI{ciID}.legendName);
 
                     % x-axis: ticks, labels, limits
@@ -197,6 +195,10 @@ for ciSetID = 1 : length(ciSets)
                     % Switch axes
                     axes(has(2 * (tailID - 1) + densityID))
                     ylim(yLimsSplit{tailID}{find(sectorsExported == exportCombosNoDens{comboID, 1})});
+                end
+                % Delete ticks on the right plots
+                if densityID ~= 1
+                    yticklabels([])
                 end
             end  
         end
@@ -257,7 +259,7 @@ for ciSetID = 1 : length(ciSets)
             comboID);
         figureSavingName = extractBefore(figureSavingName, ...
             strlength(figureSavingName)-11);
-        figureSavingName = figureSavingName + ciSets{ciSetID}.titleTail;
+        figureSavingName = figureSavingName + ciSetsSplit{ciSetID}.titleTail;
         set(gcf,'Units','Inches');
         pos = get(gcf,'Position');
         set(gcf,'PaperPositionMode','Auto',...
@@ -268,6 +270,212 @@ for ciSetID = 1 : length(ciSets)
     end
 end
 
+%% Quantile plots with possible (mean, var)-matching
+% All the exported sectors on the same figure
+% Only 1 CI per density to prevent overcrowding
+
+% Loop through confidence interval sets
+for ciSetID = 1 : length(ciSetsJoint)
+    
+    % Extract current CI set
+    ciID = ciSetsJoint{ciSetID}.ciID; 
+
+    % Create plots with and without mean-variance adjustment
+    for adjID = 1 : length(adjustMeanVar)
+        % Extract adjustment flag
+        adjFlag = adjustMeanVar(adjID);
+
+        % Select color mode, suptitle, top margins
+        if ciSetsJoint{ciSetID}.colorField == "plottingColorBW"
+            % Plots for the main text
+            colorArray = bwJoint;
+            if adjFlag
+                currentSuptitle = ...
+                    {"Confidence Intervals for Extreme Quantiles", ...
+                        suptitle{adjID}};
+                topMarg = 0.15;
+            else
+                currentSuptitle = ...
+                    "Confidence Intervals for Extreme Quantiles";
+            end
+        else
+            % Plots for the Online Appendix
+            colorArray = colorJoint;
+            if adjFlag
+                currentSuptitle = ...
+                    {"Confidence Intervals for Extreme Quantiles", ...
+                        "(" + patchedCI{ciID}.legendName + ")",... 
+                        suptitle{adjID}};
+                topMarg = 0.2;
+            else
+                currentSuptitle= suptitle{adjID};
+                topMarg = 0.12;
+            end
+        end
+
+        % --- Figure creation ---
+        figure('Renderer','painters', ...
+            'Position', [50 50 plotW 1.4*plotH]) 
+        [has, ~] = tight_subplot(length(sectorsExported), 2, ...
+            [0.07 0.03], [0.13 topMarg], [0.05 0.05]);
+    
+        % --- Plotting ---
+
+        % Loop through sectors (=figure rows)
+        currentRow = 0;
+        for comboID =  1 : numNonDensCombos
+            % Export the required sectors (due to data avalaibility limitations)
+            if ~ismember(exportCombosNoDens{comboID, 1}, sectorsExported)
+                continue
+            else
+                currentRow = currentRow + 1;
+            end
+    
+            % Loop over tails
+            for tailID = 1 : 2
+    
+                % Switch axes
+                axes(has(tailID + 2*(currentRow-1)))
+    
+                % Add one CI per density
+                for densityID = 1 : length(densityLevels)
+    
+                    % Find position in full combo table
+                    overallComboID = findOverallID(exportCombinations, ...
+                        exportCombosNoDens, ...
+                        densityVarName, ...
+                        densityLevels, ...
+                        comboID, ...
+                        densityID);
+    
+                    % Load in data
+                    fileName  = empResultOutputName(empResultFolder, ...
+                        exportCombinations, overallComboID);
+                    load(fileName)
+    
+                    % Extract sample sizes
+                    sampleSize{densityID} = currentResults.N;
+    
+                    % Extract quantile data
+                    quantileData = currentResults.fittedCIs{ciID}.fittedCI;
+                    quantileData = smoothdata(quantileData', ...
+                        "gaussian", ciSetsJoint{ciSetID}.gaussK)';
+    
+                    % Apply mean-variance transformation if necessary
+                    if adjFlag
+                        quantileData = ...
+                            (quantileData-...
+                             currentResults.meanTFP)./(sqrt(currentResults.varTFP));  
+                    end
+
+                    % Extract target quantiles
+                    currentTargetQuantiles = ...
+                        currentResults.fittedCIs{ciID}.targetQuantiles;
+
+                    % Compute plotting data
+                    [tailTargetQuantiles, tailQuantiles, ...
+                        spacing, ticks, tickLabels, ...
+                        thresholdTau] = ...
+                        tailPlotData(currentTargetQuantiles, ...
+                        quantileData, ...
+                        thresholds(tailID), ...
+                        spacingExponentX, tickStep, ...
+                        currentResults.N);
+                    spacingMarker = spacing(1:markerStep:end);
+                    tailMarker = tailQuantiles(:, 1:markerStep:end);
+
+                    % Line plot
+                    plot(spacing, tailQuantiles, ...
+                        "LineStyle", lineStyleJoint{densityID}, ...
+                        "LineWidth", plotLineThicknessJoint, ...
+                        "Color", colorArray{densityID}, ...
+                        'HandleVisibility','off');
+                    hold on
+
+                    % Marker plot
+                    plot(spacingMarker, tailMarker, ...
+                        currentResults.fittedCIs{ciID}.plottingLineStyle, ...
+                        'LineStyle','none',...
+                        "Marker", markerStyleJoint{densityID}, ...
+                        "MarkerSize", jointMarkerSize, ...
+                        "LineWidth", plotLineThicknessJoint, ...
+                        "Color", colorArray{densityID}, ...
+                        'HandleVisibility','off');
+
+                    % Legend plot
+                    plot(-0.001, min(tailQuantiles, [], 'all'), ...
+                        currentResults.fittedCIs{ciID}.plottingLineStyle, ...
+                        "LineStyle", lineStyleJoint{densityID}, ...
+                        "Marker", markerStyleJoint{densityID}, ...
+                        "MarkerSize", jointMarkerSize, ...
+                        "LineWidth", plotLineThicknessJoint, ...
+                        "Color", colorArray{densityID}, ...
+                        "DisplayName", legendJoint{densityID});
+
+                    % x-axis: ticks, labels, limits
+                    xticks(ticks)
+                    xticklabels(tickLabels)
+                    xlim([min(spacing), max(spacing)])
+
+                    % Bottom line: xlabel
+                    if currentRow == length(sectorsExported)
+                        xlabel("Quantile")
+                    else
+                        xticklabels([])
+                    end
+                end
+                % y limit
+                ylim(yLimsJoint{adjID}{tailID}{currentRow});
+
+                % Title only on the left side
+                if tailID == 1
+                    currentTitle{1} = getSectorName(sectorLabelsPath, ...
+                        currentResults.characteristics.nace_section);
+                    currentTitle{1} = "\textbf{" + currentTitle{1} + "}";
+                    currentTitle{2} = "AMD $N$ = " + num2str(sampleSize{2}) + ...
+                        ", BMD $N$ = " + num2str(sampleSize{1});
+                else 
+                    currentTitle{1} = '';
+                end
+                ttl = title(currentTitle);
+                ttl.Units = 'Normalize';
+                ttl.Position(1) = 0;
+                ttl.HorizontalAlignment = 'left';
+                clear currentTitle
+            end
+
+            % --- Legend on last plot ---
+            if densityID == length(densityLevels) && ...
+                    currentRow == length(sectorsExported)
+                legend('Location', 'northwest')
+            end
+
+            % --- Suptitle ---
+            % Add overall title to first exported plot
+            if exportCombosNoDens{comboID, 1} == sectorsExported(1)
+                firstLine = firstLineNoAdjust;
+            else
+                firstLine = '';
+            end
+
+            % Set the suptitle
+            sgt = sgtitle(currentSuptitle);
+
+            % --- Exporting in SVG and PDF ---
+            figureSavingName = figureOutputFolder + "joint_" + ...
+                ciSetsJoint{ciSetID}.titleTail  + ...
+                "adj_" + num2str(adjFlag);
+            set(gcf,'Units','Inches');
+            pos = get(gcf,'Position');
+            set(gcf,'PaperPositionMode','Auto',...
+                'PaperUnits','Inches', ...
+                'PaperSize',[pos(3), pos(4)])
+            print(gcf, figureSavingName, '-dsvg');
+            print(gcf, figureSavingName, '-dpdf');
+        end
+    end
+end
+ 
 %% Auxiliary functions
 
 function [tailTargetQuantiles, tailQuantiles, ...
@@ -278,7 +486,30 @@ function [tailTargetQuantiles, tailQuantiles, ...
                     thresholdQ, ...
                     spacingExponentX, tickStep, ...
                     N)
-% tailPlotData Determine
+% tailPlotData Prepare data for plotting representation.
+%
+% Args: 
+%     targetQuantiles (vector): vector of target quantile ranks, sorted.
+%     quantileData (2xk matrix): matrix of confidence intervals, columns
+%       index target quantiles
+%     thresholdQ (scalar): value at which the plot terminates. Function
+%       automatically infers whether the data belongs to the left or the
+%       right plot.
+%     spacingExponentX (scalar): power for rescaling the x-axis.
+%     tickStep (integer): every how many points a tick should be created on
+%       the x-axis.
+%     N (integer): cross-sectional sample size.
+%
+% Returns:
+%     tailTargetQuantiles (vector): target quantile ranks belonging to the
+%       target tail, up to thresholdQ.
+%     tailQuantiles (2xk matrix): matrix of confidence intervals up to
+%       quantile thresholdQ.
+%     spacing (vector): vector to use for the x-axis plotting.
+%     ticks (vector): subvector of spacing, tick locations.
+%     tickLocations (vector): labels reflecting target quantile.
+%     ruleOfThumbTau (scalar): quantile level at which the extreme rule of
+%       thumb kicks in.
 
     if thresholdQ >= 0.5
         % Right tail
@@ -328,8 +559,8 @@ function [tailTargetQuantiles, tailQuantiles, ...
         % Compute rule of thumb threshold
         ruleOfThumbTau = 100/N;
     end
-    
 end
+
 
 function fileName = ...
     empResultOutputName(empResultFolder, ...
@@ -373,6 +604,7 @@ function fileName = ...
     % Add the folder
     fileName = empResultFolder + fileName;
 end
+
 
 function overallComboID = findOverallID(currentComboTable, ...
                             currentComboTableNoAbsentVar, ...
@@ -447,13 +679,27 @@ function suptitle = suptitleBuilderQuantileComp(initString, ...
         charTable.Properties.VariableNames, ...
         repmat({"nace_section"}, ...
             size(charTable.Properties.VariableNames))));
-    if sectorInfoFlag
-        % Import labels for sectors
-        sectorLabels = readtable(sectorLabelsPath);
-        sectorLabels = convertvars(sectorLabels,"name", 'string');
-        suptitle{currentIndex} = "Sector: " + sectorLabels{charTable.nace_section, 2}; 
+    if sectorInfoFlag 
+        suptitle{currentIndex} = "Sector: " + ...
+            getSectorName(sectorLabelsPath, charTable.nace_section); 
     else
         suptitle{currentIndex} = "Pooling all sectors";
     end
  
+end
+
+
+function sectorName = getSectorName(sectorLabelsPath, row)
+% getSectorName Get sector name from sector labels table.
+% 
+% Args:
+%   sectorLabelsPath (string): path to table with sector names. 
+%   row (integer): row index in the label table.
+%
+% Returns:
+%   sectorName (string): name of the target sector.
+
+    sectorLabels = readtable(sectorLabelsPath);
+    sectorLabels = convertvars(sectorLabels,"name", 'string');
+    sectorName =  sectorLabels{row, 2};
 end
