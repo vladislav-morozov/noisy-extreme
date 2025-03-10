@@ -48,7 +48,7 @@ I discuss methods to build confidence intervals for extreme quantiles. These con
 
 ## Empirical Results: Summary
 
-![This is the caption](results/figures/empirical-figure-1.svg)
+![This is the caption](results/figures/empirical-figure-1.png)
  
 ## Software Requirements
 

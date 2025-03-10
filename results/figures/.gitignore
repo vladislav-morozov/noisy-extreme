@@ -2,4 +2,4 @@
 *
 # Except this gitignore and example empirical figure
 !.gitignore
-!empirical-figure-1.svg
+!empirical-figure-1.png
