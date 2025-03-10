@@ -8,25 +8,33 @@
 %
 % Description:
 %   This script runs the simulations on confidence intervals for extreme
-%   quantiles. 
+%   quantiles. It also exports the empirical application plots.
 %
 % Usage: 
 %   To reproduce the full set of simulation results, execute this script 
-%   directly. The script will generate all necessary outputs, including 
-%   figures and tables, which are automatically saved to the 'results' 
-%   folder.
+%   directly up to block IV. The script will generate all necessary 
+%   outputs, including figures and tables, which are automatically saved 
+%   to the 'results' folder.
+%   To reproduce the empirical plots using the results arrays, execute
+%   the last section of the script.
+%
+% For simulation and empirical design and theoretical background:
+%  - Link to paper: 
+%     arxiv.org/abs/2210.08524 
+%  - Link to the appendix: 
+%     vladislav-morozov.github.io/assets/files/2_noisyExtremeSupplement.pdf
+%  
+% Inputs:
+%   - Simulations: none required.
+%   - Empirical application: estimated quantiles and confidence intervals.
+%     Note: this data is restricted and based on the CBI microdata from 
+%     Banco de España. It is not supplied in the replication repo.
 %
 % Output: 
 %   - The results of the simulation are saved in the 'results/simulation' 
 %     folder.
 %   - Figures and plots are saved in the 'results/figures' folder.
 %
-% For simulation design and overall background on unit averaging:
-%  - Link to paper: 
-%     arxiv.org/abs/2210.08524 
-%  - Link to the appendix: 
-%     vladislav-morozov.github.io/assets/files/2_noisyExtremeSupplement.pdf
-% 
 % Software Requirements:
 %   - MATLAB (tested on R2024b). 
 %   - Toolboxes: 
@@ -63,6 +71,7 @@ alphaCI = 0.05;
 
 % Target quantiles
 targetQuantiles = [0.9:0.005:0.99, 0.9905:0.0005:1]; 
+
 
 %% Specifying the data generating distributions
 % The model considered is y_{it} = \theta_i'x_{it} + u_{it}
@@ -136,3 +145,7 @@ simulateIVTNormality
 
 % Export figures
 exportIntermediateFitPlots
+
+%% Block 5: export empirical plots
+
+exportEmpiricalPlots
