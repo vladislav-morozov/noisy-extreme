@@ -6,9 +6,9 @@ This repository contains the codes for the paper **"Inference on Extreme Quantil
 It contains
 
 - A simulation study for the properties of various confidence intervals for extreme quantiles when only noisy observations are available. 
-- An empirical application to differences in the productivity of the best and the worst firms in denser and less denser areas.
+- An empirical application to differences in the productivity of the best and the worst firms in denser and less dense areas.
 
-The codes are written in Matlab. They can run to reproduce the simulation and empirical results presented in the [paper](https://arxiv.org/abs/2210.08524) and the [Online Appendix](https://vladislav-morozov.github.io/files/2_noisyExtremeSupplement.pdf).
+The codes are written in Matlab. They can be run to reproduce the simulation and empirical results presented in the [paper](https://arxiv.org/abs/2210.08524) and the [Online Appendix](https://vladislav-morozov.github.io/files/2_noisyExtremeSupplement.pdf).
 
 
 ## Contents
@@ -35,12 +35,12 @@ It is sometimes important to estimate such extreme quantiles of objects that dif
 2. In random effects meta-analysis, the true treatment effects of an intervention may differ between studies.  A 95% prediction interval is an interval such that the true treatment effect in a new study falls with probability 95% in it. Such intervals provide an important summary of between-study heterogeneity. To construct such an interval, one needs to estimate and quantify uncertainty about the 2.5th and 97.5th percentiles of the distribution of study-specific treatment effects.
  
 
-The challenges lies in the fact that only noisy estimates of individual heterogeneity are available (firm productivity, study-level treatment effects). Such estimates are based on limited data like individual time series or small studies. Furthermore, the noise in the data and the true values of heterogeneity are often mixed together in a complicated way.
+The challenge lies in the fact that only noisy estimates of individual heterogeneity are available (firm productivity, study-level treatment effects). Such estimates are based on limited data like individual time series or small studies. Furthermore, the estimation noisy and the heterogeneity of interest may have a complex dependence structure. 
 
 ## Results: Tail Equivalence Conditions and Methods for Inference on Extreme Quantiles
 
 
-In this paper, I present an approach to conduct inference on extreme quantiles when only noisy estimates are available. I lay out specific conditions under which the noisy data can still give us information about the extreme values we care about. Specifically, the tails of the distribution of noisy estimates need to converge to the tails of the distribution of interest in a certain weak pointwise sense.
+In this paper, I present an approach for conducting inference on extreme quantiles when only noisy estimates are available. I lay out specific conditions under which the noisy data can still give us information about the extreme values we care about. Specifically, the tails of the distribution of noisy estimates need to converge to the tails of the distribution of interest in a certain weak pointwise sense.
 
 I discuss methods to build confidence intervals for extreme quantiles. These confidence intervals use self-normalized ratios of order statistics of the estimates. Furthermore, I provide hypothesis tests regarding the support of individual heterogeneity. To back up these methods, I prove appropriate extreme and intermediate value theorems for noisy data.
 
@@ -69,7 +69,7 @@ A selected figure: confidence intervals for extreme quantiles of firm-level prod
 2. Open MATLAB and set the current folder to the repository directory.
 3. Run the `main.m` up to reproduce all results:
   - Blocks I-IV contain the full simulations.
-  - Black V export the plots for the empirical application.
+  - Block V export the plots for the empirical application.
 
 ## Repository Structure
 
@@ -91,7 +91,7 @@ A selected figure: confidence intervals for extreme quantiles of firm-level prod
 
 
 > [!NOTE]
-> The replication folder does not contain the contents of the `results/` folder. For simulations, this is done as the simulation results files are large. For the empirical application, there are restrictions on sharing the data, as the results are based on restricted-access microdata.
+> The replication folder does not contain the contents of the `results/` folder. For simulations, this is done as the simulation result files are large. For the empirical application, there are restrictions on sharing the data, as the results are based on restricted-access microdata.
  
 ## License
 This code is provided under the MIT License. You can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software. You must include the original copyright notice and this permission notice in all copies or substantial portions of the software. The software is provided "as is", without any warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
