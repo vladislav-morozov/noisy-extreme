@@ -301,8 +301,7 @@ for ciSetID = 1 : length(ciSetsJoint)
                         suptitle{adjID}};
                 topMarg = 0.15;
             else
-                currentSuptitle = ...
-                    "Confidence Intervals for Extreme Quantiles";
+                currentSuptitle = suptitle{adjID};
             end
         else
             % Plots for the Online Appendix
