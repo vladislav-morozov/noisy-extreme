@@ -21,8 +21,7 @@ The codes are written in Matlab. They can run to reproduce the simulation and em
 - [License](#license)
 - [External Functions Used](#external-functions-used)
 - [Contact](#contact)
-
-
+  
  
 
 ## About: Extreme Quantiles and Noisy Observations
@@ -48,11 +47,19 @@ I discuss methods to build confidence intervals for extreme quantiles. These con
 
 ## Empirical Results: Summary
 
-![This is the caption](results/figures/empirical-figure-1.png)
+I apply the methodology of the paper to study differences in firm productivity between denser and less dense areas following Combes et al. (2012, Econometrica; CDGPR12 for short). Since firm productivity must be estimated from firm-level data, this setting naturally aligns with the framework. 
+
+There are two key empirical questions:
+
+1. Is there evidence for stronger firm competition in denser areas? If so, we would expect to see left-truncation in the productivity distribution. I find no evidence of such truncation. 
+2. CDGPR12 assume that the productivity distributions in denser and less dense areas are identical up to mean and variance. Is there evidence for this assumption? The paper shows nonparametrically that the tails are remarkably similar once we account for these two parameters.  
+ 
+A selected figure: confidence intervals for extreme quantiles of firm-level productivity in denser and less dense areas for wholesale and retail trade firms:
+![Selected results: confidence intervals for extreme quantiles of firm productivity in the wholesale and retail sectors](results/figures/empirical-figure-1.png)
  
 ## Software Requirements
 
-- MATLAB (tested with 2024b).
+- MATLAB 2024a or later (tested with 2024b).
 - Required toolboxes: Parallel Computation Toolbox.
 - Required File Exchange files: `tight_subplot`. Supplied with the replication code.
 
