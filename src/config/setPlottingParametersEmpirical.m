@@ -41,7 +41,7 @@ numNonDensCombos = height(exportCombosNoDens);
 % Sectors to export
 sectorsExported = [7, 12, 13];
 yLimsSplit{1} = {[-3, 0], [-5.4, 0], [-7.5, 0]};               % Left tail
-yLimsSplit{2} = {[0, 3], [0, 3], [0, 3]};                    % Right tail
+yLimsSplit{2} = {[0, 3], [-.55, 3], [0, 3]};                    % Right tail
 
 % Mean-variance adjustments for the joint plot
 adjustMeanVar = [true, false];
@@ -239,7 +239,7 @@ subsamplingFixedDenomSimColor = [1, 135, 232]/255;
 subsamplingFixedDenomSimColorBW = [1, 1, 1]/255; 
 subsamplingFixedDenomSimLine = '-';
 subsamplingFixedDenomSimMarker = 'o';
-subsamplingFixedDenomSimMarkerSize = 7;
+subsamplingFixedDenomSimMarkerSize = 5;
 % Instantiate
 methodArrayExtremeSimFixedQ = ...
     quantileEstimatorConfidenceIntervalArray(fitExtrFixedQSim, ...
