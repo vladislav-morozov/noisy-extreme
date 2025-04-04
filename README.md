@@ -8,7 +8,7 @@ It contains
 - A simulation study for the properties of various confidence intervals for extreme quantiles when only noisy observations are available. 
 - An empirical application to differences in the productivity of the best and the worst firms in denser and less dense areas.
 
-The codes are written in Matlab. They can be run to reproduce the simulation and empirical results presented in the [paper](https://arxiv.org/abs/2210.08524) and the [Online Appendix](https://vladislav-morozov.github.io/files/2_noisyExtremeSupplement.pdf).
+The codes are written in Matlab. They can be run to reproduce the simulation and empirical results presented in the [paper](https://arxiv.org/abs/2210.08524) and the [Online Appendix](https://vladislav-morozov.github.io/assets/files/2_noisyExtremeSupplement.pdf).
 
 
 ## Contents
