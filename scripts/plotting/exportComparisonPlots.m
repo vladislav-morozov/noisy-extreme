@@ -209,30 +209,21 @@ for plotSetID = 1 : length(plotSet)
 
 
                         % Display legend on last plot if legend is required
-                        if (plotSet{plotSetID}.destination == "main" && plotID == 2) ...
-                                || plotSet{plotSetID}.destination ~= "main"
+                        if plotID == 2 || plotID == 3
                             if plotNum == numN*numT && linePlots{plotID}.plotLegend
                                 lgd = legend(...
                                     'Position', ...
                                     plotSet{plotSetID}.legendPosition);
                                 fontsize(lgd, ...
-                                    plotSet{plotSetID}.legendFontSize,'points')
+                                    plotSet{plotSetID}.legendFontSize,'points'); 
                             end
                         end
                     end
                 end
-
-                % Add suptitle
-                if plotSet{plotSetID}.destination == "OA"
-                    sgt = sgtitle({linePlots{plotID}.suptitle, ...
-                        "$F = " + thetaSampler.distrLegendName + "$, " + ...
-                        "$G = " + uSampler.distrLegendName + "$", ...
-                        }, ...
-                        'interpreter','latex');
-                else
-                    sgt = sgtitle(linePlots{plotID}.suptitle);
-                end
-
+                
+                
+                sgt = sgtitle(linePlots{plotID}.suptitle);
+                 
                 % Create figure saving name
                 figureSavingName =   "results/figures/" + ...
                     plotSet{plotSetID}.colorField + "_" + ...
@@ -246,12 +237,11 @@ for plotSetID = 1 : length(plotSet)
                 set(gcf, 'PaperPosition', [0 0 1.8*8 8])
                 print(gcf, figureSavingName, '-dpng', '-r300' );
 
-                % Prepare export settings for PDF
+                % Prepare export settings for PDF and export
                 set(gcf,'Units','Inches');
                 pos = get(gcf,'Position');
                 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-                % Export as PDF
-                print(gcf, figureSavingName, '-dpdf');
+                print(gcf, figureSavingName, '-dpdf'); 
 
                 disp(plotDGP_ID)
             end
