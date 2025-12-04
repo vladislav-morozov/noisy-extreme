@@ -16,7 +16,7 @@ set(groot, 'defaultLegendInterpreter','latex');
 set(groot, 'defaultTextInterpreter', 'latex'); 
   
 % Line parameters 
-plotLineThickness= 1.6;     % Line thickness 
+plotLineThickness= 2.4;     % Line thickness 
 colorMode = 'color';        % Colormode: 'color' or 'BW'
 destination = 'OA';         % Destination: 'OA' or 'main'
 markerStep = 4;             % Step size for adding markers

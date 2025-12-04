@@ -41,8 +41,8 @@
 
 plotSet{1}.destination = "OA";                            % destination
 plotSet{1}.colorField = 'plottingColor';                  % color field name
-plotSet{1}.NsPlot = Ns;                                   % vector of N
-plotSet{1}.TsPlot = Ts;                                   % vector of T
+plotSet{1}.NsPlot = [Ns(1), Ns(2)];                       % N to plot
+plotSet{1}.TsPlot = [Ts(1), Ts(end)];                     % T to plot
 plotSet{1}.maxPlotID = length(linePlots);                 % last line plot
 plotSet{1}.minPlotDGP_ID =  1;                            % first DGP ID
 plotSet{1}.maxPlotDGP_ID =  height(samplerTable);         % last DPG ID

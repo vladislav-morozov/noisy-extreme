@@ -57,8 +57,8 @@ tickStep = 6;                              % Tick step
 spacingExponentX = 1.2;                    % Exponent for x-spacing
 plotH = 350;                               % Height in pixels
 plotW = 900;                               % Width in pixels
-plotLineThicknessSplit= 1.6;               % Line thickness (split plot)
-plotLineThicknessJoint = 1.3;              % Line thickness (joint plot)
+plotLineThicknessSplit= 2.5;               % Line thickness (split plot)
+plotLineThicknessJoint = 3;              % Line thickness (joint plot)
 jointMarkerSize = 4;                       % Marker size (join plot
 useRunningYLim = false;                    % y-limits determined dynamically
 
@@ -97,7 +97,7 @@ yLimsJoint{2} = yLimsSplit;                          % ylim: no adjustment
 % Plots split by AME/BME: setup
 % Main text: Jochmans-Weidner and a single extreme interval
 ciSetsSplit{1}.ciIDs = [1, 3];                     
-ciSetsSplit{1}.colorField = 'plottingColorBW';
+ciSetsSplit{1}.colorField = 'plottingColor';
 ciSetsSplit{1}.titleTail = '';
 ciSetsSplit{1}.gaussK = 1;
 
@@ -135,7 +135,7 @@ ciSetsSplit{7}.gaussK = 5;
 % Plots with joint AME/BME: setup
 % Main text: Jochmans-Weidner and a single extreme interval
 ciSetsJoint{1}.ciID = 3;                     
-ciSetsJoint{1}.colorField = 'plottingColorBW';
+ciSetsJoint{1}.colorField = 'plottingColor';
 ciSetsJoint{1}.titleTail = '';
 ciSetsJoint{1}.gaussK = 3;
 

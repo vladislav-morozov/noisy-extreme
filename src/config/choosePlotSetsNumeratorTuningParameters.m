@@ -41,14 +41,14 @@
 
 plotSet{1}.destination = "OA";                            % destination
 plotSet{1}.colorField = 'plottingColor';                  % color field name
-plotSet{1}.NsPlot = Ns;                                   % vector of N
-plotSet{1}.TsPlot = Ts;                                   % vector of T
+plotSet{1}.NsPlot = [Ns(1), Ns(2)];                       % vector of N
+plotSet{1}.TsPlot = [Ts(1), Ts(end)];                     % vector of T
 plotSet{1}.maxPlotID = length(linePlots);                 % last line plot
 plotSet{1}.minPlotDGP_ID =  1;                            % first DGP ID
 plotSet{1}.maxPlotDGP_ID =  height(samplerTable);         % last DPG ID
 plotSet{1}.margH = [.07 .175];                            % Vertical margins
 plotSet{1}.legendFontSize = 6.5;                          % Font size
-plotSet{1}.legendPosition = [0.814, 0.892, 0.1, 0.04];    % Position
+plotSet{1}.legendPosition = [0.797, 0.092 0.1, 0.04]; % Position
 plotSet{1}.plotH = 550;                                   % Px height
 plotSet{1}.plotW = 550*1.8;                               % Px width
 

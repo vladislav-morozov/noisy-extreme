@@ -47,14 +47,14 @@ commonSet.name = "";
 
 plotSet{1}.destination = "OA";
 plotSet{1}.colorField = 'plottingColor';
-plotSet{1}.NsPlot = Ns;
-plotSet{1}.TsPlot = Ts;
+plotSet{1}.NsPlot = [Ns(1), Ns(2)];
+plotSet{1}.TsPlot = [Ts(1), Ts(end)];
 plotSet{1}.maxPlotID = length(linePlots);
 plotSet{1}.minPlotDGP_ID =  1;
-plotSet{1}.maxPlotDGP_ID =  height(samplerTable);
+plotSet{1}.maxPlotDGP_ID =  height(samplerTable); 
 plotSet{1}.margH = [.07 .145];
 plotSet{1}.legendFontSize = 6.5;
-plotSet{1}.legendPosition = [0.814, 0.912, 0.1, 0.04];
+plotSet{1}.legendPosition = [0.814, 0.912, 0.14, 0.04];
 plotSet{1}.plotH = 550;
 plotSet{1}.plotW = 1.8*plotSet{1}.plotH; 
 plotSet{1}.intervalSets = {commonSet};
@@ -63,7 +63,7 @@ plotSet{1}.intervalSets = {commonSet};
 %% Plots for the main text
 
 plotSet{2}.destination = "main";
-plotSet{2}.colorField = 'plottingColorBW';
+plotSet{2}.colorField = 'plottingColor';
 plotSet{2}.NsPlot = [Ns(1), Ns(2)];
 plotSet{2}.TsPlot = [Ts(1), Ts(end)];
 plotSet{2}.maxPlotID = 2;
